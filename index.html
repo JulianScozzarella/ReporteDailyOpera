@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tablero Daily & Revenue Management | Sheraton Pilar</title>
+  <title>Tablero Operativo Diario | Sheraton Pilar</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js -->
@@ -20,12 +20,18 @@
       border-color: #0f172a;
       box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
     }
+    .outlet-pill.active {
+      background-color: #f59e0b;
+      color: #0f172a;
+      font-weight: 700;
+      border-color: #f59e0b;
+    }
     .tabular-nums { font-variant-numeric: tabular-nums; }
   </style>
 </head>
 <body class="text-slate-800 antialiased pb-16">
 
-  <!-- HEADER EJECUTIVO -->
+  <!-- HEADER EJECUTIVO SIMPLIFICADO -->
   <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
       <!-- Identidad -->
@@ -35,18 +41,18 @@
         </div>
         <div>
           <div class="flex items-center gap-2 flex-wrap">
-            <h1 class="text-base sm:text-lg font-bold tracking-tight">SHERATON PILAR · DAILY & REVENUE ANALYTICS</h1>
+            <h1 class="text-base sm:text-lg font-bold tracking-tight">SHERATON PILAR · ACTIVIDAD DIARIA & OUTLETS</h1>
             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-              Opera PMS + F138 YoY Auditado
+              Opera PMS Auditado
             </span>
           </div>
           <p class="text-xs text-slate-400">
-            Datos Auditados (11/11 al 18/11/2026) · Comparativa vs. Año Pasado (LY) · TC Opera: <strong class="text-amber-400">$1.500,00 ARS/USD</strong>
+            Operación del 11/11 al 18/11/2026 · Tipo de Cambio: <strong class="text-amber-400">$1.500,00 ARS/USD</strong>
           </p>
         </div>
       </div>
 
-      <!-- CONTROLES DE TIEMPO, MONEDA Y DECIMALES -->
+      <!-- CONTROLES DE FECHA, PERÍODO Y MONEDA -->
       <div class="flex flex-wrap items-center gap-2">
         <!-- Navegador de Día Puntual -->
         <div id="day-navigator" class="flex items-center bg-slate-800 rounded-lg p-1 border border-slate-700">
@@ -71,7 +77,7 @@
           </button>
         </div>
 
-        <!-- Selector de Modo (Día vs Consolidados) -->
+        <!-- Selector de Modo -->
         <div class="bg-slate-800 p-1 rounded-lg flex text-xs font-medium border border-slate-700">
           <button onclick="setMode('day')" id="mode-day" class="px-2.5 py-1.5 rounded-md transition bg-amber-500 text-slate-900 font-semibold">
             Día Puntual
@@ -80,10 +86,10 @@
             Cons. 8 Días
           </button>
           <button onclick="setMode('mtd')" id="mode-mtd" class="px-2.5 py-1.5 rounded-md transition text-slate-300 hover:text-white">
-            Mes Real (MTD)
+            Mes (MTD)
           </button>
           <button onclick="setMode('ytd')" id="mode-ytd" class="px-2.5 py-1.5 rounded-md transition text-slate-300 hover:text-white">
-            Año Real (YTD)
+            Año (YTD)
           </button>
         </div>
 
@@ -107,24 +113,33 @@
 
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6">
 
-    <!-- PESTAÑAS DE NAVEGACIÓN POR UNIDAD DE NEGOCIO Y REVENUE MANAGEMENT -->
+    <!-- 1. INDICADORES PRINCIPALES DE LA ACTIVIDAD DEL DÍA / PERÍODO (ARRIBA DE TODO) -->
+    <section class="space-y-3 tabular-nums">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-600 flex items-center gap-2">
+          <i data-lucide="activity" class="w-4 h-4 text-amber-500"></i>
+          Resumen de Actividad: <span id="hero-period-label" class="text-slate-900">Mar 17/11/2026</span>
+        </h2>
+        <span class="text-xs text-slate-500">Inventario físico: <strong>140 habitaciones</strong></span>
+      </div>
+
+      <div id="hero-kpi-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+    </section>
+
+    <!-- 2. NAVEGACIÓN POR ÁREA / SECTOR -->
     <section class="flex flex-wrap items-center justify-between gap-3 bg-white p-2.5 rounded-xl card-shadow border border-slate-200/80">
       <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
         <button onclick="setSector('ALL')" id="sec-ALL" class="sector-btn active flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold border border-transparent transition">
           <i data-lucide="layout-dashboard" class="w-4 h-4 text-amber-400"></i>
-          Consolidado Hotel
-        </button>
-        <button onclick="setSector('REVENUE')" id="sec-REVENUE" class="sector-btn flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200/70 transition">
-          <i data-lucide="trending-up" class="w-4 h-4 text-rose-600"></i>
-          Revenue & vs. Año Pasado (YoY)
+          Vista Consolidada
         </button>
         <button onclick="setSector('ROOMS')" id="sec-ROOMS" class="sector-btn flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200/70 transition">
           <i data-lucide="bed-double" class="w-4 h-4 text-blue-600"></i>
-          Habitaciones
+          Habitaciones & Segmentos
         </button>
         <button onclick="setSector('AB')" id="sec-AB" class="sector-btn flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200/70 transition">
           <i data-lucide="utensils" class="w-4 h-4 text-amber-600"></i>
-          Restaurantes & Banquetes
+          Restaurantes, Desayunos & Banquetes
         </button>
         <button onclick="setSector('SPA')" id="sec-SPA" class="sector-btn flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200/70 transition">
           <i data-lucide="sparkles" class="w-4 h-4 text-emerald-600"></i>
@@ -137,93 +152,21 @@
       </div>
     </section>
 
-    <!-- TARJETAS DINÁMICAS DE KPI -->
-    <section id="kpi-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 tabular-nums"></section>
+    <!-- 3. PANEL DETALLADO DINÁMICO (DESAYUNOS, RESTAURANTES POR OUTLET, SEGMENTOS HAB.) -->
+    <section id="sector-spotlight" class="bg-white rounded-xl p-5 card-shadow border border-slate-200/70 tabular-nums"></section>
 
-    <!-- SECCIÓN ESPECIAL DE REVENUE MANAGEMENT & COMPARATIVA YOY -->
-    <section id="revenue-yoy-section" class="hidden space-y-6 tabular-nums">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <!-- Tarjeta Izquierda: Diagnóstico Estratégico y Lucro Cesante OOO -->
-        <div class="bg-white rounded-xl p-5 card-shadow border border-slate-200/70 lg:col-span-6 flex flex-col justify-between space-y-4">
-          <div>
-            <div class="flex items-center justify-between">
-              <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                <i data-lucide="gauge" class="w-5 h-5 text-rose-600"></i>
-                Indicadores Avanzados de Revenue Management
-              </h3>
-              <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200" id="rev-period-tag">Período Activo</span>
-            </div>
-            <p class="text-xs text-slate-500 mt-1">Análisis de rentabilidad integral por habitación disponible (TRevPAR), captura por huésped e impacto de bloqueos OOO.</p>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="rev-advanced-cards"></div>
-          <div id="ooo-alert-box" class="p-3.5 rounded-xl border"></div>
-        </div>
-
-        <!-- Tarjeta Derecha: Monitor de Forecast Noviembre (NOV26) & On The Books Diciembre (DEC26) -->
-        <div class="bg-white rounded-xl p-5 card-shadow border border-slate-200/70 lg:col-span-6 flex flex-col justify-between space-y-4">
-          <div>
-            <div class="flex items-center justify-between">
-              <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                <i data-lucide="target" class="w-5 h-5 text-indigo-600"></i>
-                Pace & Proyección de Cierre (Opera F138 Forecast)
-              </h3>
-              <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">On The Books</span>
-            </div>
-            <p class="text-xs text-slate-500 mt-1">Grado de cumplimiento del acumulado mensual frente al cierre proyectado de Noviembre (NOV26) y colchón vendido para Diciembre (DEC26).</p>
-          </div>
-          <div id="forecast-pace-container" class="space-y-4"></div>
-        </div>
-      </div>
-
-      <!-- Matriz Comparativa Completa: Año Actual (2026) vs. Año Pasado (LY - 2025) -->
-      <div class="bg-white rounded-xl card-shadow border border-slate-200/70 overflow-hidden">
-        <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-              <i data-lucide="git-compare" class="w-5 h-5 text-amber-500"></i>
-              Matriz Comparativa Interanual: 2026 vs. Año Pasado (Last Year - F138)
-            </h3>
-            <p class="text-xs text-slate-500">Permite evaluar la estrategia de Tarifa (ADR) vs. Volumen (Ocupación) y el crecimiento real por departamento en Día, Mes (MTD) y Año (YTD).</p>
-          </div>
-          <span class="text-xs font-semibold px-3 py-1 rounded-lg bg-slate-900 text-amber-400" id="yoy-currency-indicator">Moneda: ARS</span>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider border-b border-slate-200">
-                <th class="py-3 px-4 font-semibold">Indicador / Departamento</th>
-                <th class="py-3 px-3 font-semibold text-right">Día 2026</th>
-                <th class="py-3 px-3 font-semibold text-right">Día LY</th>
-                <th class="py-3 px-3 font-semibold text-center border-r border-slate-200">Var. Día</th>
-                <th class="py-3 px-3 font-semibold text-right">Mes (MTD 26)</th>
-                <th class="py-3 px-3 font-semibold text-right">Mes (MTD LY)</th>
-                <th class="py-3 px-3 font-semibold text-center border-r border-slate-200">Var. MTD</th>
-                <th class="py-3 px-3 font-semibold text-right">Año (YTD 26)</th>
-                <th class="py-3 px-3 font-semibold text-right">Año (YTD LY)</th>
-                <th class="py-3 px-3 font-semibold text-center">Var. YTD</th>
-              </tr>
-            </thead>
-            <tbody id="yoyTableBody" class="divide-y divide-slate-100 text-xs sm:text-sm"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- PANEL DE DETALLE OPERATIVO POR SECTOR (Habitaciones, A&B, Spa) -->
-    <section id="sector-spotlight" class="hidden bg-white rounded-xl p-5 card-shadow border border-slate-200/70 tabular-nums"></section>
-
-    <!-- GRÁFICOS DINÁMICOS -->
+    <!-- 4. GRÁFICOS LIMPIOS (SIN COMPARATIVA AÑO PASADO) -->
     <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       <!-- Gráfico Izquierdo -->
       <div class="bg-white rounded-xl p-5 card-shadow border border-slate-200/60 lg:col-span-7 flex flex-col justify-between">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
-            <h3 class="text-base font-bold text-slate-800" id="left-chart-title">Evolución de Movimientos Diarios (11/11 al 18/11/2026)</h3>
-            <p class="text-xs text-slate-400" id="left-chart-sub">Hacé clic en cualquier barra para inspeccionar ese día en todo el tablero</p>
+            <h3 class="text-base font-bold text-slate-800" id="left-chart-title">Facturación Diaria (11/11 al 18/11/2026)</h3>
+            <p class="text-xs text-slate-400">Hacé clic en cualquier barra para ver la actividad de ese día</p>
           </div>
           <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 tabular-nums" id="trend-sum-badge">Suma 8 días</span>
         </div>
-        <div class="relative h-72">
+        <div class="relative h-64">
           <canvas id="trendChart"></canvas>
         </div>
       </div>
@@ -231,25 +174,25 @@
       <!-- Gráfico Derecho -->
       <div class="bg-white rounded-xl p-5 card-shadow border border-slate-200/60 lg:col-span-5 flex flex-col justify-between">
         <div>
-          <h3 class="text-base font-bold text-slate-800" id="right-chart-title">Participación por Centro de Facturación</h3>
-          <p class="text-xs text-slate-400 mb-3" id="mix-subtitle">Sobre el período y sector seleccionados</p>
+          <h3 class="text-base font-bold text-slate-800" id="right-chart-title">Distribución de Ingresos</h3>
+          <p class="text-xs text-slate-400 mb-3" id="mix-subtitle">Sobre el período y filtro seleccionados</p>
         </div>
-        <div class="relative h-56 flex items-center justify-center">
+        <div class="relative h-52 flex items-center justify-center">
           <canvas id="mixChart"></canvas>
         </div>
         <div id="mix-legend" class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs tabular-nums"></div>
       </div>
     </section>
 
-    <!-- TABLA AUDITADA CON CONCILIACIÓN VERTICAL Y HORIZONTAL -->
+    <!-- 5. TABLA DE DETALLE DE INGRESOS -->
     <section class="bg-white rounded-xl card-shadow border border-slate-200/60 overflow-hidden tabular-nums">
       <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h3 class="text-base font-bold text-slate-800">Matriz Conciliada de Ventas (Día · Cons. 8 Días · MTD · YTD)</h3>
-          <p class="text-xs text-slate-400">Formato argentino verificado: punto (.) para miles y coma (,) para decimales. Sumas verticales y horizontales exactas.</p>
+          <h3 class="text-base font-bold text-slate-800">Detalle de Facturación por Concepto</h3>
+          <p class="text-xs text-slate-400">Valores conciliados por Día, Acumulado 8 Días, Mes (MTD) y Año (YTD).</p>
         </div>
         <div class="relative w-full sm:w-64">
-          <input type="text" id="searchInput" oninput="renderTable()" placeholder="Filtrar rubro, salón, outlet..."
+          <input type="text" id="searchInput" oninput="renderTable()" placeholder="Buscar restaurante, desayuno, salón..."
             class="w-full text-xs border border-slate-200 rounded-lg pl-8 pr-3 py-2 bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500" />
           <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
         </div>
@@ -261,11 +204,11 @@
             <tr class="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider border-b border-slate-200">
               <th class="py-3.5 px-4 font-semibold">Sector / Concepto</th>
               <th class="py-3.5 px-4 font-semibold text-right" id="th-day">Día Selecc.</th>
-              <th class="py-3.5 px-4 font-semibold text-right">Cons. 8 Días (11-18/11)</th>
-              <th class="py-3.5 px-4 font-semibold text-right">Mes Real (MTD)</th>
-              <th class="py-3.5 px-4 font-semibold text-right">Año Real (YTD)</th>
-              <th class="py-3.5 px-4 font-semibold text-right">% Share</th>
-              <th class="py-3.5 px-4 font-semibold text-center">Referencia / KPI</th>
+              <th class="py-3.5 px-4 font-semibold text-right">Cons. 8 Días</th>
+              <th class="py-3.5 px-4 font-semibold text-right">Mes (MTD)</th>
+              <th class="py-3.5 px-4 font-semibold text-right">Año (YTD)</th>
+              <th class="py-3.5 px-4 font-semibold text-right">% Part.</th>
+              <th class="py-3.5 px-4 font-semibold text-center">Detalle Operativo</th>
             </tr>
           </thead>
           <tbody id="tableBody" class="divide-y divide-slate-100 text-xs sm:text-sm"></tbody>
@@ -277,7 +220,7 @@
 
   <script>
     // =========================================================================
-    // 1. FORMATEADORES ESTRICTOS EN ESPAÑOL ARGENTINA (. miles / , decimales)
+    // 1. CONFIGURACIÓN Y FORMATEADORES ARGENTINA (. miles / , decimales)
     // =========================================================================
     const EXCHANGE_RATE = 1500;
     const DATES_LIST = [
@@ -287,10 +230,11 @@
 
     let state = {
       selectedDate: '2026-11-17',
-      mode: 'day',       // 'day' | 'cons8' | 'mtd' | 'ytd'
-      sector: 'ALL',     // 'ALL' | 'REVENUE' | 'ROOMS' | 'AB' | 'SPA'
-      currency: 'ARS',   // 'ARS' | 'USD'
-      showDecimals: true // true (,00) | false (sin decimales)
+      mode: 'day',          // 'day' | 'cons8' | 'mtd' | 'ytd'
+      sector: 'ALL',        // 'ALL' | 'ROOMS' | 'AB' | 'SPA'
+      outletFilter: 'ALL',  // 'ALL' | 'Las Vasijas' | 'Don Giovanni' | 'Lobby Bar' | 'Room Service' | 'Banquetes'
+      currency: 'ARS',      // 'ARS' | 'USD'
+      showDecimals: true
     };
 
     function formatNumberAR(val, decimals = 2) {
@@ -319,185 +263,192 @@
     }
 
     // =========================================================================
-    // 2. DATOS OPERATIVOS DIARIOS + LAST YEAR (LY) + FORECAST F138 + CUBIERTOS DETALLADOS
+    // 2. DATOS OPERATIVOS DIARIOS (HABITACIONES, CUBIERTOS POR TURNO Y DESAYUNO)
     // =========================================================================
+    // Nota: Incluye desglose de cubiertos por turno y facturación específica de
+    // Desayuno (Directo en salón vs. Incluido en Paquete de Alojamiento Cód. 199)
     const dailyOps = {
       '2026-11-11': {
         label: 'Mié 11/11/2026', short: 'Mié 11/11',
         roomsPhysical: 140, roomsOoo: 24, roomsAvail: 116, roomsOcc: 89, roomsPaid: 88,
         transients: 68, groups: 19, crews: 1, comp: 1, guests: 127,
-        occLyPct: 64.20, roomsOccLy: 90, adrLy: 158200.00, revParLy: 101564.40,
-        roomRevLy: 14219016.00, abRevLy: 24120000.00, otherRevLy: 4150000.00,
-        vasijasCovers: 83, giovanniCovers: 58, lobbyCovers: 122, rsCovers: 11, banquetsCovers: 299,
+        roomTypes: { classic: 58, executive: 22, suites: 9 },
         coversDetail: {
           vasijasDesayuno: 58, vasijasAlmuerzo: 15, vasijasCena: 10,
           giovanniCena: 58, lobbyBar: 122, roomService: 11, banquetes: 299
+        },
+        breakfastRev: {
+          directSalon: 485200.00,
+          packageIncluded: 1245000.00
         }
       },
       '2026-11-12': {
         label: 'Jue 12/11/2026', short: 'Jue 12/11',
         roomsPhysical: 140, roomsOoo: 25, roomsAvail: 115, roomsOcc: 97, roomsPaid: 96,
         transients: 91, groups: 4, crews: 1, comp: 1, guests: 149,
-        occLyPct: 67.80, roomsOccLy: 95, adrLy: 162400.00, revParLy: 110107.20,
-        roomRevLy: 15415008.00, abRevLy: 22450000.00, otherRevLy: 3890000.00,
-        vasijasCovers: 127, giovanniCovers: 55, lobbyCovers: 122, rsCovers: 18, banquetsCovers: 190,
+        roomTypes: { classic: 64, executive: 24, suites: 9 },
         coversDetail: {
           vasijasDesayuno: 89, vasijasAlmuerzo: 22, vasijasCena: 16,
           giovanniCena: 55, lobbyBar: 122, roomService: 18, banquetes: 190
+        },
+        breakfastRev: {
+          directSalon: 742500.00,
+          packageIncluded: 1910000.00
         }
       },
       '2026-11-13': {
         label: 'Vie 13/11/2026', short: 'Vie 13/11',
         roomsPhysical: 140, roomsOoo: 25, roomsAvail: 115, roomsOcc: 79, roomsPaid: 78,
         transients: 68, groups: 8, crews: 2, comp: 1, guests: 153,
-        occLyPct: 68.10, roomsOccLy: 95, adrLy: 159800.00, revParLy: 108823.80,
-        roomRevLy: 15235332.00, abRevLy: 25180000.00, otherRevLy: 3420000.00,
-        vasijasCovers: 242, giovanniCovers: 58, lobbyCovers: 122, rsCovers: 11, banquetsCovers: 240,
+        roomTypes: { classic: 51, executive: 20, suites: 8 },
         coversDetail: {
           vasijasDesayuno: 160, vasijasAlmuerzo: 45, vasijasCena: 37,
           giovanniCena: 58, lobbyBar: 122, roomService: 11, banquetes: 240
+        },
+        breakfastRev: {
+          directSalon: 1320000.00,
+          packageIncluded: 3480000.00
         }
       },
       '2026-11-14': {
         label: 'Sáb 14/11/2026', short: 'Sáb 14/11',
         roomsPhysical: 140, roomsOoo: 24, roomsAvail: 116, roomsOcc: 114, roomsPaid: 112,
         transients: 111, groups: 0, crews: 1, comp: 2, guests: 250,
-        occLyPct: 75.20, roomsOccLy: 105, adrLy: 184500.00, revParLy: 138744.00,
-        roomRevLy: 19424160.00, abRevLy: 29800000.00, otherRevLy: 5890000.00,
-        vasijasCovers: 242, giovanniCovers: 85, lobbyCovers: 122, rsCovers: 11, banquetsCovers: 296,
+        roomTypes: { classic: 72, executive: 30, suites: 12 },
         coversDetail: {
           vasijasDesayuno: 165, vasijasAlmuerzo: 42, vasijasCena: 35,
           giovanniCena: 85, lobbyBar: 122, roomService: 11, banquetes: 296
+        },
+        breakfastRev: {
+          directSalon: 1480000.00,
+          packageIncluded: 3650000.00
         }
       },
       '2026-11-15': {
         label: 'Dom 15/11/2026', short: 'Dom 15/11',
         roomsPhysical: 140, roomsOoo: 25, roomsAvail: 115, roomsOcc: 52, roomsPaid: 51,
         transients: 45, groups: 3, crews: 3, comp: 1, guests: 180,
-        occLyPct: 58.40, roomsOccLy: 82, adrLy: 149200.00, revParLy: 87132.80,
-        roomRevLy: 12198592.00, abRevLy: 26400000.00, otherRevLy: 4120000.00,
-        vasijasCovers: 245, giovanniCovers: 0, lobbyCovers: 122, rsCovers: 11, banquetsCovers: 175,
+        roomTypes: { classic: 34, executive: 13, suites: 5 },
         coversDetail: {
           vasijasDesayuno: 170, vasijasAlmuerzo: 45, vasijasCena: 30,
           giovanniCena: 0, lobbyBar: 122, roomService: 11, banquetes: 175
+        },
+        breakfastRev: {
+          directSalon: 1610000.00,
+          packageIncluded: 3590000.00
         }
       },
       '2026-11-16': {
         label: 'Lun 16/11/2026', short: 'Lun 16/11',
         roomsPhysical: 140, roomsOoo: 26, roomsAvail: 114, roomsOcc: 100, roomsPaid: 100,
         transients: 88, groups: 9, crews: 3, comp: 0, guests: 140,
-        occLyPct: 72.14, roomsOccLy: 101, adrLy: 164083.62, revParLy: 118374.61,
-        roomRevLy: 16572446.00, abRevLy: 19442632.00, otherRevLy: 3853414.00,
-        vasijasCovers: 175, giovanniCovers: 0, lobbyCovers: 107, rsCovers: 4, banquetsCovers: 144,
+        roomTypes: { classic: 66, executive: 25, suites: 9 },
         coversDetail: {
           vasijasDesayuno: 120, vasijasAlmuerzo: 30, vasijasCena: 25,
           giovanniCena: 0, lobbyBar: 107, roomService: 4, banquetes: 144
+        },
+        breakfastRev: {
+          directSalon: 1120000.00,
+          packageIncluded: 2580000.00
         }
       },
       '2026-11-17': {
         label: 'Mar 17/11/2026', short: 'Mar 17/11',
         roomsPhysical: 140, roomsOoo: 27, roomsAvail: 113, roomsOcc: 111, roomsPaid: 111,
         transients: 97, groups: 11, crews: 3, comp: 0, guests: 178,
-        occLyPct: 66.43, roomsOccLy: 93, adrLy: 160744.20, revParLy: 106780.08,
-        roomRevLy: 14949211.00, abRevLy: 23850400.00, otherRevLy: 3410200.00,
-        vasijasCovers: 242, giovanniCovers: 48, lobbyCovers: 69, rsCovers: 16, banquetsCovers: 126,
+        roomTypes: { classic: 71, executive: 29, suites: 11 },
         coversDetail: {
           vasijasDesayuno: 165, vasijasAlmuerzo: 42, vasijasCena: 35,
           giovanniCena: 48, lobbyBar: 69, roomService: 16, banquetes: 126
+        },
+        breakfastRev: {
+          directSalon: 1540000.00,
+          packageIncluded: 3540000.00
         }
       },
       '2026-11-18': {
         label: 'Mié 18/11/2026', short: 'Mié 18/11',
         roomsPhysical: 140, roomsOoo: 27, roomsAvail: 113, roomsOcc: 73, roomsPaid: 73,
         transients: 71, groups: 2, crews: 0, comp: 0, guests: 118,
-        occLyPct: 62.14, roomsOccLy: 87, adrLy: 154300.00, revParLy: 95882.02,
-        roomRevLy: 13424100.00, abRevLy: 15200000.00, otherRevLy: 3580000.00,
-        vasijasCovers: 87, giovanniCovers: 19, lobbyCovers: 51, rsCovers: 9, banquetsCovers: 134,
+        roomTypes: { classic: 48, executive: 18, suites: 7 },
         coversDetail: {
           vasijasDesayuno: 59, vasijasAlmuerzo: 16, vasijasCena: 12,
           giovanniCena: 19, lobbyBar: 51, roomService: 9, banquetes: 134
+        },
+        breakfastRev: {
+          directSalon: 520000.00,
+          packageIncluded: 1290000.00
         }
       }
     };
 
-    // Acumulados Operativos Reales de Opera (F138) + Last Year (LY)
     const periodOps = {
       mtd: {
-        label: 'Acumulado Mes Noviembre (MTD Opera Real)',
+        label: 'Acumulado Mes Noviembre (MTD)',
         roomsPhysical: 2380, roomsOoo: 391, roomsAvail: 1989, roomsOcc: 1709, roomsPaid: 1694,
         transients: 942, groups: 716, crews: 51, comp: 15, guests: 2801,
-        occLyPct: 73.53, roomsOccLy: 1750, adrLy: 156922.77, revParLy: 115385.31,
-        roomRevLy: 274617040.00, abRevLy: 448674325.00, otherRevLy: 48743934.00,
-        vasijasCovers: 3680, giovanniCovers: 790, lobbyCovers: 1090, rsCovers: 280, banquetsCovers: 2420,
+        roomTypes: { classic: 1110, executive: 435, suites: 164 },
         coversDetail: {
           vasijasDesayuno: 2510, vasijasAlmuerzo: 640, vasijasCena: 530,
           giovanniCena: 790, lobbyBar: 1090, roomService: 280, banquetes: 2420
+        },
+        breakfastRev: {
+          directSalon: 21850000.00,
+          packageIncluded: 53400000.00
         }
       },
       ytd: {
-        label: 'Acumulado Año 2026 (YTD Opera Real)',
+        label: 'Acumulado Año 2026 (YTD)',
         roomsPhysical: 44940, roomsOoo: 1375, roomsAvail: 43565, roomsOcc: 26625, roomsPaid: 26516,
         transients: 17787, groups: 8018, crews: 820, comp: 109, guests: 46794,
-        occLyPct: 61.60, roomsOccLy: 27683, adrLy: 127092.93, revParLy: 78289.24,
-        roomRevLy: 3518313580.00, abRevLy: 5826557891.00, otherRevLy: 496505546.00,
-        vasijasCovers: 56200, giovanniCovers: 12400, lobbyCovers: 16100, rsCovers: 4700, banquetsCovers: 41200,
+        roomTypes: { classic: 17300, executive: 6780, suites: 2545 },
         coversDetail: {
           vasijasDesayuno: 38200, vasijasAlmuerzo: 9800, vasijasCena: 8200,
           giovanniCena: 12400, lobbyBar: 16100, roomService: 4700, banquetes: 41200
+        },
+        breakfastRev: {
+          directSalon: 318400000.00,
+          packageIncluded: 795200000.00
         }
       }
     };
 
-    // Proyección de Cierre Mes Actual (NOV26) y On The Books Mes Próximo (DEC26) desde IMPORTAR_F138
-    const forecastF138 = {
-      nov26: {
-        period: 'NOV26 (Proyección Cierre Mes)',
-        roomsOcc: 2578, occPct: 76.73, adr: 179939.77,
-        roomRev: 463884735.00, abRev: 539441798.00, otherRev: 36180392.00, totalRev: 1039506924.00
-      },
-      dec26: {
-        period: 'DEC26 (On The Books Diciembre)',
-        roomsOcc: 1394, occPct: 32.12, adr: 164721.23,
-        roomRev: 229621391.00, abRev: 46400000.00, otherRev: 0.00, totalRev: 276021391.00
-      }
-    };
-
     // =========================================================================
-    // 3. MATRIZ DE INGRESOS DEPURADA (11/11 al 18/11 + MTD Opera + YTD Opera)
+    // 3. MATRIZ DE INGRESOS DEPURADA
     // =========================================================================
     const revenueLines = [
-      // HABITACIONES (ROOMS)
+      // HABITACIONES
       {
         sector: 'ROOMS', category: 'Alojamiento Puro',
         name: 'Habitaciones Transients (Individuales / Corporativos)',
         days: { '2026-11-11': 12202612.82, '2026-11-12': 15235022.41, '2026-11-13': 11157272.24, '2026-11-14': 20560260.41, '2026-11-15': 8467306.79,  '2026-11-16': 9406603.04,  '2026-11-17': 15632753.97, '2026-11-18': 7925158.54 },
-        mtd: 184420110.40, ytd: 2385120400.19, kpi: '639 hab. en los 8 días'
+        mtd: 184420110.40, ytd: 2385120400.19, kpi: '639 hab. en 8 días'
       },
       {
         sector: 'ROOMS', category: 'Alojamiento Puro',
         name: 'Habitaciones Grupos (Eventos & Convenciones)',
         days: { '2026-11-11': 3660604.50, '2026-11-12': 811772.00,  '2026-11-13': 1364602.50, '2026-11-14': 0.00, '2026-11-15': 608829.00,  '2026-11-16': 1958894.50, '2026-11-17': 2040000.00, '2026-11-18': 361202.00 },
-        mtd: 64250240.24, ytd: 752452009.40, kpi: '56 hab. en los 8 días'
+        mtd: 64250240.24, ytd: 752452009.40, kpi: '56 hab. en 8 días'
       },
       {
         sector: 'ROOMS', category: 'Alojamiento Puro',
         name: 'Habitaciones Tripulación (Crews)',
         days: { '2026-11-11': 157500.00, '2026-11-12': 157500.00, '2026-11-13': 315000.00, '2026-11-14': 157500.00, '2026-11-15': 464589.69, '2026-11-16': 465025.00, '2026-11-17': 0.00,      '2026-11-18': 0.00 },
-        mtd: 7955000.00, ytd: 117600000.00, kpi: '14 hab. en los 8 días'
+        mtd: 7955000.00, ytd: 117600000.00, kpi: '14 hab. en 8 días'
       },
       {
         sector: 'ROOMS', category: 'Paquetes Hab.',
-        name: 'Paquetes de Alojamiento / Otros Ingresos Rooms (Cód. 199)',
+        name: 'Paquetes de Alojamiento (Desayuno Incluido / Spa / Cód. 199)',
         days: { '2026-11-11': 4738021.37, '2026-11-12': 5719896.83, '2026-11-13': 5462441.58, '2026-11-14': 9424667.85, '2026-11-15': 3844340.76, '2026-11-16': 6852890.50, '2026-11-17': 7303784.54, '2026-11-18': 3844340.76 },
-        mtd: 84950830.06, ytd: 962760220.41, kpi: 'Desayuno / Spa / Late Out'
+        mtd: 84950830.06, ytd: 962760220.41, kpi: 'Incluye Desayunos Paquete'
       },
 
-      // RESTAURANTES & BANQUETES (A&B)
+      // RESTAURANTES & BANQUETES
       {
         sector: 'AB', category: 'Las Vasijas',
-        name: 'Las Vasijas — Alimentos (Desayuno, Almuerzo y Cena)',
+        name: 'Las Vasijas — Alimentos (Desayuno Directo, Almuerzo y Cena)',
         days: { '2026-11-11': 1257305.78,  '2026-11-12': 3591305.81, '2026-11-13': 5548429.75,  '2026-11-14': 6596363.65, '2026-11-15': 10741479.34, '2026-11-16': 7234550.01, '2026-11-17': 10940836.36, '2026-11-18': 5033941.32 },
-        mtd: 93829724.19, ytd: 1218893739.32, kpi: '1.443 cub. en los 8 días'
+        mtd: 93829724.19, ytd: 1218893739.32, kpi: '1.443 cub. en 8 días'
       },
       {
         sector: 'AB', category: 'Las Vasijas',
@@ -509,7 +460,7 @@
         sector: 'AB', category: 'Don Giovanni',
         name: 'Don Giovanni — Alimentos (Cena)',
         days: { '2026-11-11': 4487231.40, '2026-11-12': 1824421.48, '2026-11-13': 2316776.84, '2026-11-14': 4487231.40, '2026-11-15': 0.00,       '2026-11-16': 0.00,       '2026-11-17': 3630165.28, '2026-11-18': 1273140.49 },
-        mtd: 19037364.31, ytd: 237644462.13, kpi: '323 cub. en los 8 días'
+        mtd: 19037364.31, ytd: 237644462.13, kpi: '323 cub. en 8 días'
       },
       {
         sector: 'AB', category: 'Don Giovanni',
@@ -521,7 +472,7 @@
         sector: 'AB', category: 'Lobby Bar',
         name: 'Lobby Bar — Alimentos & Cafetería',
         days: { '2026-11-11': 1229999.99, '2026-11-12': 1299132.24, '2026-11-13': 1202314.07, '2026-11-14': 3499752.08, '2026-11-15': 2627396.68, '2026-11-16': 1604050.12, '2026-11-17': 2158842.98, '2026-11-18': 1207809.92 },
-        mtd: 28820561.71, ytd: 366858237.54, kpi: '837 cub. en los 8 días'
+        mtd: 28820561.71, ytd: 366858237.54, kpi: '837 cub. en 8 días'
       },
       {
         sector: 'AB', category: 'Lobby Bar',
@@ -530,22 +481,22 @@
         mtd: 6531942.34, ytd: 92478290.96, kpi: 'Barra & Tragos'
       },
       {
-        sector: 'AB', category: 'Room Service & Pool',
+        sector: 'AB', category: 'Room Service',
         name: 'Room Service — Alimentos y Bebidas',
         days: { '2026-11-11': 322066.11, '2026-11-12': 491735.54, '2026-11-13': 314214.87, '2026-11-14': 313471.08, '2026-11-15': 337355.38, '2026-11-16': 196400.00, '2026-11-17': 520057.01, '2026-11-18': 312644.63 },
-        mtd: 8165031.26, ytd: 113866146.97, kpi: '91 cub. en los 8 días'
+        mtd: 8165031.26, ytd: 113866146.97, kpi: '91 cub. en 8 días'
       },
       {
-        sector: 'AB', category: 'Room Service & Pool',
+        sector: 'AB', category: 'Room Service',
         name: 'La Federala & Pool Snack',
         days: { '2026-11-11': 0.00,      '2026-11-12': 0.00,       '2026-11-13': 0.00, '2026-11-14': 0.00, '2026-11-15': 0.00,      '2026-11-16': 3992198.35, '2026-11-17': 0.00, '2026-11-18': 0.00 },
-        mtd: 6545867.74, ytd: 95820440.15, kpi: 'Outlets Estacionales / Eventos'
+        mtd: 6545867.74, ytd: 95820440.15, kpi: 'Outlets Estacionales'
       },
       {
         sector: 'AB', category: 'Banquetes',
         name: 'Banquetes — Comestibles (Alimentos)',
         days: { '2026-11-11': 12785838.51, '2026-11-12': 10539600.00, '2026-11-13': 12737000.00, '2026-11-14': 11748680.00, '2026-11-15': 10348680.00, '2026-11-16': 3736000.00,  '2026-11-17': 6961983.48,  '2026-11-18': 4487231.40 },
-        mtd: 151060811.34, ytd: 2639711126.92, kpi: '1.604 cub. en los 8 días'
+        mtd: 151060811.34, ytd: 2639711126.92, kpi: '1.604 cub. en 8 días'
       },
       {
         sector: 'AB', category: 'Banquetes',
@@ -571,7 +522,7 @@
         sector: 'SPA', category: 'Health Club & Spa',
         name: 'Health Club — Pases Diarios, Masajes e Iobella',
         days: { '2026-11-11': 2597520.66, '2026-11-12': 1252314.06, '2026-11-13': 735702.48, '2026-11-14': 2519421.49, '2026-11-15': 1976033.06, '2026-11-16': 1042148.75, '2026-11-17': 671620.66, '2026-11-18': 1252314.06 },
-        mtd: 6420120.45, ytd: 143020310.12, kpi: 'Membresías, Pases y Masajes'
+        mtd: 6420120.45, ytd: 143020310.12, kpi: 'Membresías y Pases'
       },
       {
         sector: 'SPA', category: 'Parking',
@@ -583,7 +534,7 @@
         sector: 'SPA', category: 'Otros Departamentos',
         name: 'Lavandería, Teléfonos, Internet, Minibar y Misceláneos',
         days: { '2026-11-11': 127809.93, '2026-11-12': 128141.08, '2026-11-13': 147603.32, '2026-11-14': 160925.48, '2026-11-15': 40876.56,  '2026-11-16': 106184.19, '2026-11-17': 123599.16, '2026-11-18': 128465.83 },
-        mtd: 6654904.20, ytd: 96550228.78, kpi: 'Internet 18/11 corregido ($8.135,25)'
+        mtd: 6654904.20, ytd: 96550228.78, kpi: 'Varios Departamentos'
       }
     ];
 
@@ -592,9 +543,7 @@
     // =========================================================================
     function getItemValue(item, mode = state.mode, date = state.selectedDate) {
       if (mode === 'day') return item.days[date] || 0;
-      if (mode === 'cons8') {
-        return DATES_LIST.reduce((acc, d) => acc + (item.days[d] || 0), 0);
-      }
+      if (mode === 'cons8') return DATES_LIST.reduce((acc, d) => acc + (item.days[d] || 0), 0);
       if (mode === 'mtd') return item.mtd;
       if (mode === 'ytd') return item.ytd;
       return 0;
@@ -609,12 +558,12 @@
           label: 'Consolidado 8 Días (11/11 al 18/11/2026)',
           roomsPhysical: 0, roomsOoo: 0, roomsAvail: 0, roomsOcc: 0, roomsPaid: 0,
           transients: 0, groups: 0, crews: 0, comp: 0, guests: 0,
-          roomsOccLy: 0, roomRevLy: 0, abRevLy: 0, otherRevLy: 0,
-          vasijasCovers: 0, giovanniCovers: 0, lobbyCovers: 0, rsCovers: 0, banquetsCovers: 0,
+          roomTypes: { classic: 0, executive: 0, suites: 0 },
           coversDetail: {
             vasijasDesayuno: 0, vasijasAlmuerzo: 0, vasijasCena: 0,
             giovanniCena: 0, lobbyBar: 0, roomService: 0, banquetes: 0
-          }
+          },
+          breakfastRev: { directSalon: 0, packageIncluded: 0 }
         };
         DATES_LIST.forEach(dt => {
           const o = dailyOps[dt];
@@ -628,28 +577,19 @@
           sum.crews += o.crews;
           sum.comp += o.comp;
           sum.guests += o.guests;
-          sum.roomsOccLy += o.roomsOccLy;
-          sum.roomRevLy += o.roomRevLy;
-          sum.abRevLy += o.abRevLy;
-          sum.otherRevLy += o.otherRevLy;
-          sum.vasijasCovers += o.vasijasCovers;
-          sum.giovanniCovers += o.giovanniCovers;
-          sum.lobbyCovers += o.lobbyCovers;
-          sum.rsCovers += o.rsCovers;
-          sum.banquetsCovers += o.banquetsCovers;
-          if (o.coversDetail) {
-            sum.coversDetail.vasijasDesayuno += o.coversDetail.vasijasDesayuno;
-            sum.coversDetail.vasijasAlmuerzo += o.coversDetail.vasijasAlmuerzo;
-            sum.coversDetail.vasijasCena += o.coversDetail.vasijasCena;
-            sum.coversDetail.giovanniCena += o.coversDetail.giovanniCena;
-            sum.coversDetail.lobbyBar += o.coversDetail.lobbyBar;
-            sum.coversDetail.roomService += o.coversDetail.roomService;
-            sum.coversDetail.banquetes += o.coversDetail.banquetes;
-          }
+          sum.roomTypes.classic += o.roomTypes.classic;
+          sum.roomTypes.executive += o.roomTypes.executive;
+          sum.roomTypes.suites += o.roomTypes.suites;
+          sum.coversDetail.vasijasDesayuno += o.coversDetail.vasijasDesayuno;
+          sum.coversDetail.vasijasAlmuerzo += o.coversDetail.vasijasAlmuerzo;
+          sum.coversDetail.vasijasCena += o.coversDetail.vasijasCena;
+          sum.coversDetail.giovanniCena += o.coversDetail.giovanniCena;
+          sum.coversDetail.lobbyBar += o.coversDetail.lobbyBar;
+          sum.coversDetail.roomService += o.coversDetail.roomService;
+          sum.coversDetail.banquetes += o.coversDetail.banquetes;
+          sum.breakfastRev.directSalon += o.breakfastRev.directSalon;
+          sum.breakfastRev.packageIncluded += o.breakfastRev.packageIncluded;
         });
-        sum.occLyPct = (sum.roomsOccLy / sum.roomsPhysical) * 100;
-        sum.adrLy = sum.roomRevLy / sum.roomsOccLy;
-        sum.revParLy = sum.roomRevLy / sum.roomsPhysical;
         return buildComputedOps(sum, 'cons8', date);
       }
       return buildComputedOps(periodOps[mode], mode, date);
@@ -665,39 +605,46 @@
       const pkgRoomRev = getItemValue(revenueLines[3], modeOverride, dateOverride);
       const totalRoomRev = pureRoomRev + pkgRoomRev;
 
-      const totalABRev = revenueLines.filter(i => i.sector === 'AB').reduce((a, b) => a + getItemValue(b, modeOverride, dateOverride), 0);
-      const totalSpaRev = revenueLines.filter(i => i.sector === 'SPA').reduce((a, b) => a + getItemValue(b, modeOverride, dateOverride), 0);
+      const outletsRev = revenueLines.filter(i => i.sector === 'AB' && i.category !== 'Banquetes')
+                                     .reduce((a, b) => a + getItemValue(b, modeOverride, dateOverride), 0);
+      const banquetsRev = revenueLines.filter(i => i.category === 'Banquetes')
+                                      .reduce((a, b) => a + getItemValue(b, modeOverride, dateOverride), 0);
+      const totalABRev = outletsRev + banquetsRev;
+      const totalSpaRev = revenueLines.filter(i => i.sector === 'SPA')
+                                      .reduce((a, b) => a + getItemValue(b, modeOverride, dateOverride), 0);
       const totalHotelRev = totalRoomRev + totalABRev + totalSpaRev;
 
       const adrPure = raw.roomsPaid > 0 ? pureRoomRev / raw.roomsPaid : 0;
       const arrTotal = raw.roomsPaid > 0 ? totalRoomRev / raw.roomsPaid : 0;
-      const revParNet = raw.roomsAvail > 0 ? totalRoomRev / raw.roomsAvail : 0;
-      const revParPhysical = raw.roomsPhysical > 0 ? totalRoomRev / raw.roomsPhysical : 0;
 
-      const trevParPhysical = raw.roomsPhysical > 0 ? totalHotelRev / raw.roomsPhysical : 0;
-      const trevParNet = raw.roomsAvail > 0 ? totalHotelRev / raw.roomsAvail : 0;
+      const cd = raw.coversDetail;
+      const vasijasTotalCovers = cd.vasijasDesayuno + cd.vasijasAlmuerzo + cd.vasijasCena;
+      const coversOutlets = vasijasTotalCovers + cd.giovanniCena + cd.lobbyBar + cd.roomService;
+      const coversBanquets = cd.banquetes;
 
-      const totalHotelRevLy = (raw.roomRevLy || 0) + (raw.abRevLy || 0) + (raw.otherRevLy || 0);
-      const trevParPhysicalLy = raw.roomsPhysical > 0 ? totalHotelRevLy / raw.roomsPhysical : 0;
-
-      const coversOutlets = raw.vasijasCovers + raw.giovanniCovers + raw.lobbyCovers + raw.rsCovers;
-      const coversBanquets = raw.banquetsCovers;
+      const avgOutlets = coversOutlets > 0 ? outletsRev / coversOutlets : 0;
+      const avgBanquets = coversBanquets > 0 ? banquetsRev / coversBanquets : 0;
 
       return {
         ...raw,
         occPhysicalPct, occNetPct,
         pureRoomRev, pkgRoomRev, totalRoomRev,
-        totalABRev, totalSpaRev, totalHotelRev,
-        adrPure, arrTotal, revParNet, revParPhysical,
-        trevParPhysical, trevParNet,
-        totalHotelRevLy, trevParPhysicalLy,
-        coversOutlets, coversBanquets
+        outletsRev, banquetsRev, totalABRev, totalSpaRev, totalHotelRev,
+        adrPure, arrTotal,
+        vasijasTotalCovers, coversOutlets, coversBanquets,
+        avgOutlets, avgBanquets
       };
     }
 
     function getFilteredItems() {
-      if (state.sector === 'ALL' || state.sector === 'REVENUE') return revenueLines;
-      return revenueLines.filter(i => i.sector === state.sector);
+      let items = revenueLines;
+      if (state.sector !== 'ALL') {
+        items = items.filter(i => i.sector === state.sector);
+      }
+      if (state.sector === 'AB' && state.outletFilter !== 'ALL') {
+        items = items.filter(i => i.category === state.outletFilter);
+      }
+      return items;
     }
 
     // =========================================================================
@@ -705,11 +652,8 @@
     // =========================================================================
     function onDateChange(newDate) {
       state.selectedDate = newDate;
-      if (state.mode !== 'day') {
-        setMode('day');
-      } else {
-        updateAll();
-      }
+      if (state.mode !== 'day') setMode('day');
+      else updateAll();
     }
 
     function stepDay(dir) {
@@ -726,11 +670,9 @@
       state.mode = mode;
       ['day', 'cons8', 'mtd', 'ytd'].forEach(m => {
         const btn = document.getElementById('mode-' + m);
-        if (m === mode) {
-          btn.className = "px-2.5 py-1.5 rounded-md transition bg-amber-500 text-slate-900 font-semibold";
-        } else {
-          btn.className = "px-2.5 py-1.5 rounded-md transition text-slate-300 hover:text-white";
-        }
+        btn.className = (m === mode)
+          ? "px-2.5 py-1.5 rounded-md transition bg-amber-500 text-slate-900 font-semibold"
+          : "px-2.5 py-1.5 rounded-md transition text-slate-300 hover:text-white";
       });
       document.getElementById('day-navigator').style.opacity = mode === 'day' ? '1' : '0.65';
       updateAll();
@@ -738,7 +680,8 @@
 
     function setSector(sector) {
       state.sector = sector;
-      ['ALL', 'REVENUE', 'ROOMS', 'AB', 'SPA'].forEach(s => {
+      if (sector !== 'AB') state.outletFilter = 'ALL';
+      ['ALL', 'ROOMS', 'AB', 'SPA'].forEach(s => {
         const btn = document.getElementById('sec-' + s);
         if (s === sector) {
           btn.classList.add('active');
@@ -751,15 +694,18 @@
       updateAll();
     }
 
+    function setOutletFilter(outlet) {
+      state.outletFilter = outlet;
+      updateAll();
+    }
+
     function setCurrency(curr) {
       state.currency = curr;
       ['ars', 'usd'].forEach(c => {
         const btn = document.getElementById('curr-' + c);
-        if (c.toUpperCase() === curr) {
-          btn.className = "px-2.5 py-1.5 rounded-md transition bg-white text-slate-900 font-semibold";
-        } else {
-          btn.className = "px-2.5 py-1.5 rounded-md transition text-slate-300 hover:text-white";
-        }
+        btn.className = (c.toUpperCase() === curr)
+          ? "px-2.5 py-1.5 rounded-md transition bg-white text-slate-900 font-semibold"
+          : "px-2.5 py-1.5 rounded-md transition text-slate-300 hover:text-white";
       });
       updateAll();
     }
@@ -774,476 +720,190 @@
       updateAll();
     }
 
-    function renderVarBadge(currVal, lyVal, isPp = false) {
-      if (!lyVal || lyVal === 0) return `<span class="text-xs text-slate-400">s/d</span>`;
-      const diff = isPp ? (currVal - lyVal) : (((currVal - lyVal) / lyVal) * 100);
-      const sign = diff > 0 ? '+' : '';
-      const suffix = isPp ? ' pp' : '%';
-      const color = diff >= 0
-        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-        : 'bg-rose-50 text-rose-700 border-rose-200';
-      return `<span class="inline-block px-2 py-0.5 rounded text-[11px] font-bold border ${color}">${sign}${formatNumberAR(diff, 1)}${suffix}</span>`;
-    }
-
     // =========================================================================
-    // 6. RENDERIZADO DE SECCIÓN REVENUE MANAGEMENT & COMPARATIVA YOY
+    // 6. RENDERIZADO DE INDICADORES PRINCIPALES (ARRIBA DE TODO)
     // =========================================================================
-    function renderRevenueYoYSection(ops) {
-      const section = document.getElementById('revenue-yoy-section');
-      if (state.sector !== 'REVENUE' && state.sector !== 'ALL') {
-        section.classList.add('hidden');
-        return;
-      }
-      section.classList.remove('hidden');
-
-      document.getElementById('rev-period-tag').innerText = ops.label;
-      document.getElementById('yoy-currency-indicator').innerText = `Moneda: ${state.currency}`;
-
-      const outletsRev = revenueLines.filter(i => i.sector === 'AB' && i.category !== 'Banquetes').reduce((a, b) => a + getItemValue(b), 0);
-      const spaDirectRev = getItemValue(revenueLines[15]) + getItemValue(revenueLines[16]);
-      const ancillaryPerGuest = ops.guests > 0 ? (outletsRev + spaDirectRev) / ops.guests : 0;
-      const pkgSharePct = ops.totalRoomRev > 0 ? (ops.pkgRoomRev / ops.totalRoomRev) * 100 : 0;
-
-      document.getElementById('rev-advanced-cards').innerHTML = `
-        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
-          <div class="text-[11px] font-bold uppercase text-slate-400">TRevPAR (Total Rev / Hab.)</div>
-          <div class="text-lg font-extrabold text-slate-900 mt-1">${formatMoney(ops.trevParPhysical)}</div>
-          <div class="text-xs text-indigo-600 font-semibold mt-0.5">s/Disp. Neta: ${formatMoney(ops.trevParNet)}</div>
-        </div>
-        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
-          <div class="text-[11px] font-bold uppercase text-slate-400">Gasto Outlets + Spa / Huésped</div>
-          <div class="text-lg font-extrabold text-slate-900 mt-1">${formatMoney(ancillaryPerGuest)}</div>
-          <div class="text-xs text-slate-500 mt-0.5">Sobre ${formatIntAR(ops.guests)} huéspedes in-house</div>
-        </div>
-        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
-          <div class="text-[11px] font-bold uppercase text-slate-400">Peso de Paquetes s/Rooms</div>
-          <div class="text-lg font-extrabold text-amber-600 mt-1">${formatPct(pkgSharePct)}</div>
-          <div class="text-xs text-slate-500 mt-0.5">${formatMoney(ops.pkgRoomRev)} en Cód. 199</div>
-        </div>
-        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
-          <div class="text-[11px] font-bold uppercase text-slate-400">Variación Total vs. LY</div>
-          <div class="mt-1.5">${renderVarBadge(ops.totalHotelRev, ops.totalHotelRevLy)}</div>
-          <div class="text-xs text-slate-500 mt-1">LY: ${formatMoney(ops.totalHotelRevLy)}</div>
-        </div>
-      `;
-
-      const oooBox = document.getElementById('ooo-alert-box');
-      if (ops.occNetPct >= 85) {
-        const displacedRooms = ops.roomsOoo;
-        const lostRoomRev = displacedRooms * ops.arrTotal;
-        oooBox.className = "p-3.5 rounded-xl border bg-rose-50/70 border-rose-200 text-rose-900";
-        oooBox.innerHTML = `
-          <div class="flex items-start gap-2.5">
-            <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-600 shrink-0 mt-0.5"></i>
-            <div class="text-xs leading-relaxed">
-              <strong class="font-bold">¡Alerta de Desplazamiento por Habitaciones OOO (${formatPct(ops.occNetPct)} Ocupación s/Disponibles)!</strong><br/>
-              Con el hotel operando casi al 100% de su inventario disponible, las <strong>${formatIntAR(displacedRooms)} hab. Fuera de Orden (OOO)</strong> representan un lucro cesante potencial estimado de <strong>${formatMoney(lostRoomRev)}</strong> solo en alojamiento (calculado a ARR Total de ${formatMoney(ops.arrTotal)}).
-            </div>
-          </div>
-        `;
-      } else {
-        oooBox.className = "p-3.5 rounded-xl border bg-emerald-50/70 border-emerald-200 text-emerald-900";
-        oooBox.innerHTML = `
-          <div class="flex items-start gap-2.5">
-            <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5"></i>
-            <div class="text-xs leading-relaxed">
-              <strong class="font-bold">Sin desplazamiento directo por OOO en este corte (${formatPct(ops.occNetPct)} s/Disponibles):</strong><br/>
-              Aunque se registran <strong>${formatIntAR(ops.roomsOoo)} hab. OOO</strong>, el hotel contó con margen de habitaciones disponibles (${formatIntAR(ops.roomsAvail - ops.roomsOcc)} libres) para absorber demanda sin rechazar reservas.
-            </div>
-          </div>
-        `;
-      }
-
-      const mtdOps = getConsolidatedOps('mtd');
-      const nov26 = forecastF138.nov26;
-      const dec26 = forecastF138.dec26;
-      const pctRevNov = (mtdOps.totalHotelRev / nov26.totalRev) * 100;
-      const pctRoomsNov = (mtdOps.roomsOcc / nov26.roomsOcc) * 100;
-
-      document.getElementById('forecast-pace-container').innerHTML = `
-        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 space-y-2.5">
-          <div class="flex items-center justify-between text-xs">
-            <span class="font-bold text-slate-800">Avance Facturación Noviembre (MTD vs. Proyección NOV26)</span>
-            <span class="font-extrabold text-indigo-700">${formatPct(pctRevNov)} ejecutado</span>
-          </div>
-          <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-            <div class="bg-indigo-600 h-full rounded-full" style="width:${Math.min(pctRevNov, 100)}%"></div>
-          </div>
-          <div class="flex justify-between text-[11px] text-slate-500">
-            <span>Actual MTD: <strong>${formatMoney(mtdOps.totalHotelRev)}</strong></span>
-            <span>Meta Cierre NOV26: <strong>${formatMoney(nov26.totalRev)}</strong> (${formatIntAR(nov26.roomsOcc)} hab. · ${formatPct(nov26.occPct)})</span>
-          </div>
-        </div>
-
-        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 space-y-2.5">
-          <div class="flex items-center justify-between text-xs">
-            <span class="font-bold text-slate-800">Avance Noches Ocupadas Noviembre (MTD vs. NOV26)</span>
-            <span class="font-extrabold text-emerald-700">${formatIntAR(mtdOps.roomsOcc)} / ${formatIntAR(nov26.roomsOcc)} hab. (${formatPct(pctRoomsNov)})</span>
-          </div>
-          <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-            <div class="bg-emerald-500 h-full rounded-full" style="width:${Math.min(pctRoomsNov, 100)}%"></div>
-          </div>
-          <div class="flex justify-between text-[11px] text-slate-500">
-            <span>Restan por vender/transcurrir: <strong>${formatIntAR(nov26.roomsOcc - mtdOps.roomsOcc)} hab.</strong></span>
-            <span>ADR Proyectado NOV26: <strong>${formatMoney(nov26.adr)}</strong></span>
-          </div>
-        </div>
-
-        <div class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <div class="text-xs font-bold text-slate-900">Colchón Vendido Mes Próximo — Diciembre (DEC26 On The Books)</div>
-            <div class="text-[11px] text-slate-600 mt-0.5">Reservas ya confirmadas en Opera PMS para el próximo período</div>
-          </div>
-          <div class="text-right">
-            <div class="text-sm font-extrabold text-slate-900">${formatMoney(dec26.totalRev)}</div>
-            <div class="text-[11px] font-semibold text-amber-800">${formatIntAR(dec26.roomsOcc)} hab. (${formatPct(dec26.occPct)} Occ) · ADR: ${formatMoney(dec26.adr)}</div>
-          </div>
-        </div>
-      `;
-
-      const dayO = getConsolidatedOps('day', state.selectedDate);
-      const mtdO = getConsolidatedOps('mtd');
-      const ytdO = getConsolidatedOps('ytd');
-
-      const yoyRows = [
-        {
-          label: 'Habitaciones Ocupadas (Noches)',
-          d26: formatIntAR(dayO.roomsOcc), dLy: formatIntAR(dayO.roomsOccLy), dVar: renderVarBadge(dayO.roomsOcc, dayO.roomsOccLy),
-          m26: formatIntAR(mtdO.roomsOcc), mLy: formatIntAR(mtdO.roomsOccLy), mVar: renderVarBadge(mtdO.roomsOcc, mtdO.roomsOccLy),
-          y26: formatIntAR(ytdO.roomsOcc), yLy: formatIntAR(ytdO.roomsOccLy), yVar: renderVarBadge(ytdO.roomsOcc, ytdO.roomsOccLy)
-        },
-        {
-          label: '% Ocupación (Sobre 140 Físicas)',
-          d26: formatPct(dayO.occPhysicalPct), dLy: formatPct(dayO.occLyPct), dVar: renderVarBadge(dayO.occPhysicalPct, dayO.occLyPct, true),
-          m26: formatPct(mtdO.occPhysicalPct), mLy: formatPct(mtdO.occLyPct), mVar: renderVarBadge(mtdO.occPhysicalPct, mtdO.occLyPct, true),
-          y26: formatPct(ytdO.occPhysicalPct), yLy: formatPct(ytdO.occLyPct), yVar: renderVarBadge(ytdO.occPhysicalPct, ytdO.occLyPct, true)
-        },
-        {
-          label: 'Tarifa Promedio Efectiva (ARR Total)',
-          d26: formatMoney(dayO.arrTotal), dLy: formatMoney(dayO.adrLy), dVar: renderVarBadge(dayO.arrTotal, dayO.adrLy),
-          m26: formatMoney(mtdO.arrTotal), mLy: formatMoney(mtdO.adrLy), mVar: renderVarBadge(mtdO.arrTotal, mtdO.adrLy),
-          y26: formatMoney(ytdO.arrTotal), yLy: formatMoney(ytdO.adrLy), yVar: renderVarBadge(ytdO.arrTotal, ytdO.adrLy)
-        },
-        {
-          label: 'RevPAR (Sobre Inventario Físico)',
-          d26: formatMoney(dayO.revParPhysical), dLy: formatMoney(dayO.revParLy), dVar: renderVarBadge(dayO.revParPhysical, dayO.revParLy),
-          m26: formatMoney(mtdO.revParPhysical), mLy: formatMoney(mtdO.revParLy), mVar: renderVarBadge(mtdO.revParPhysical, mtdO.revParLy),
-          y26: formatMoney(ytdO.revParPhysical), yLy: formatMoney(ytdO.revParLy), yVar: renderVarBadge(ytdO.revParPhysical, ytdO.revParLy)
-        },
-        {
-          label: 'TRevPAR (Facturación Total / Hab. Física)',
-          d26: formatMoney(dayO.trevParPhysical), dLy: formatMoney(dayO.trevParPhysicalLy), dVar: renderVarBadge(dayO.trevParPhysical, dayO.trevParPhysicalLy),
-          m26: formatMoney(mtdO.trevParPhysical), mLy: formatMoney(mtdO.trevParPhysicalLy), mVar: renderVarBadge(mtdO.trevParPhysical, mtdO.trevParPhysicalLy),
-          y26: formatMoney(ytdO.trevParPhysical), yLy: formatMoney(ytdO.trevParPhysicalLy), yVar: renderVarBadge(ytdO.trevParPhysical, ytdO.trevParPhysicalLy)
-        },
-        {
-          label: 'Ingresos Habitaciones (Rooms Revenue)',
-          d26: formatMoney(dayO.totalRoomRev), dLy: formatMoney(dayO.roomRevLy), dVar: renderVarBadge(dayO.totalRoomRev, dayO.roomRevLy),
-          m26: formatMoney(mtdO.totalRoomRev), mLy: formatMoney(mtdO.roomRevLy), mVar: renderVarBadge(mtdO.totalRoomRev, mtdO.roomRevLy),
-          y26: formatMoney(ytdO.totalRoomRev), yLy: formatMoney(ytdO.roomRevLy), yVar: renderVarBadge(ytdO.totalRoomRev, ytdO.roomRevLy)
-        },
-        {
-          label: 'Ingresos A&B (Restaurantes + Banquetes)',
-          d26: formatMoney(dayO.totalABRev), dLy: formatMoney(dayO.abRevLy), dVar: renderVarBadge(dayO.totalABRev, dayO.abRevLy),
-          m26: formatMoney(mtdO.totalABRev), mLy: formatMoney(mtdO.abRevLy), mVar: renderVarBadge(mtdO.totalABRev, mtdO.abRevLy),
-          y26: formatMoney(ytdO.totalABRev), yLy: formatMoney(ytdO.abRevLy), yVar: renderVarBadge(ytdO.totalABRev, ytdO.abRevLy)
-        },
-        {
-          label: 'Ingresos Spa, Parking & Otros',
-          d26: formatMoney(dayO.totalSpaRev), dLy: formatMoney(dayO.otherRevLy), dVar: renderVarBadge(dayO.totalSpaRev, dayO.otherRevLy),
-          m26: formatMoney(mtdO.totalSpaRev), mLy: formatMoney(mtdO.otherRevLy), mVar: renderVarBadge(mtdO.totalSpaRev, mtdO.otherRevLy),
-          y26: formatMoney(ytdO.totalSpaRev), yLy: formatMoney(ytdO.otherRevLy), yVar: renderVarBadge(ytdO.totalSpaRev, ytdO.otherRevLy)
-        },
-        {
-          label: 'FACTURACIÓN TOTAL HOTEL',
-          isBold: true,
-          d26: formatMoney(dayO.totalHotelRev), dLy: formatMoney(dayO.totalHotelRevLy), dVar: renderVarBadge(dayO.totalHotelRev, dayO.totalHotelRevLy),
-          m26: formatMoney(mtdO.totalHotelRev), mLy: formatMoney(mtdO.totalHotelRevLy), mVar: renderVarBadge(mtdO.totalHotelRev, mtdO.totalHotelRevLy),
-          y26: formatMoney(ytdO.totalHotelRev), yLy: formatMoney(ytdO.totalHotelRevLy), yVar: renderVarBadge(ytdO.totalHotelRev, ytdO.totalHotelRevLy)
-        }
-      ];
-
-      document.getElementById('yoyTableBody').innerHTML = yoyRows.map(r => `
-        <tr class="${r.isBold ? 'bg-slate-900 text-white font-bold' : 'hover:bg-slate-50'} transition">
-          <td class="py-3 px-4 ${r.isBold ? 'text-amber-400' : 'font-semibold text-slate-800'}">${r.label}</td>
-          <td class="py-3 px-3 text-right">${r.d26}</td>
-          <td class="py-3 px-3 text-right ${r.isBold ? 'text-slate-300' : 'text-slate-500'}">${r.dLy}</td>
-          <td class="py-3 px-3 text-center border-r ${r.isBold ? 'border-slate-700' : 'border-slate-200'}">${r.dVar}</td>
-          <td class="py-3 px-3 text-right">${r.m26}</td>
-          <td class="py-3 px-3 text-right ${r.isBold ? 'text-slate-300' : 'text-slate-500'}">${r.mLy}</td>
-          <td class="py-3 px-3 text-center border-r ${r.isBold ? 'border-slate-700' : 'border-slate-200'}">${r.mVar}</td>
-          <td class="py-3 px-3 text-right">${r.y26}</td>
-          <td class="py-3 px-3 text-right ${r.isBold ? 'text-slate-300' : 'text-slate-500'}">${r.yLy}</td>
-          <td class="py-3 px-3 text-center">${r.yVar}</td>
-        </tr>
-      `).join('');
-    }
-
-    // =========================================================================
-    // 7. RENDERIZADO DE TARJETAS KPI PRINCIPALES
-    // =========================================================================
-    function renderKPIs() {
+    function renderHeroSummary() {
       const ops = getConsolidatedOps();
-      const totalHotel = ops.totalHotelRev;
-      const totalRooms = ops.totalRoomRev;
-      const totalAB = ops.totalABRev;
-      const totalSpa = ops.totalSpaRev;
+      document.getElementById('hero-period-label').innerText = ops.label;
 
       const sectorNames = {
-        ALL: 'Consolidado Total Hotel',
-        REVENUE: 'Revenue Management & Comparativa YoY',
-        ROOMS: 'Habitaciones (Rooms)',
-        AB: 'Restaurantes & Banquetes',
-        SPA: 'Health Club, Spa, Parking & Otros'
+        ALL: 'Vista Consolidada Hotel',
+        ROOMS: 'Habitaciones & Segmentos',
+        AB: state.outletFilter === 'ALL' ? 'Restaurantes & Banquetes (Todos)' : `Outlet: ${state.outletFilter}`,
+        SPA: 'Spa, Health Club & Otros'
       };
-      document.getElementById('active-filter-badge').innerText = `${sectorNames[state.sector]} · ${ops.label}`;
+      document.getElementById('active-filter-badge').innerText = `Viendo: ${sectorNames[state.sector]}`;
 
-      const kpiGrid = document.getElementById('kpi-grid');
+      document.getElementById('hero-kpi-grid').innerHTML = `
+        <!-- 1. HABITACIONES -->
+        <div class="bg-white rounded-xl p-5 card-shadow border-t-4 border-blue-600 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-blue-700">1. Habitaciones</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700">
+                ${formatIntAR(ops.roomsOcc)} hab. (${formatPct(ops.occPhysicalPct)})
+              </span>
+            </div>
+            <div class="mt-2.5 text-2xl font-extrabold text-slate-900">${formatMoney(ops.totalRoomRev)}</div>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-slate-100 space-y-1 text-xs text-slate-600">
+            <div class="flex justify-between">
+              <span>Tarifa Prom. (ARR Total):</span>
+              <strong class="text-slate-900">${formatMoney(ops.arrTotal)}</strong>
+            </div>
+            <div class="flex justify-between">
+              <span>Tipos: Classic ${formatIntAR(ops.roomTypes.classic)} · Exec ${formatIntAR(ops.roomTypes.executive)} · Suite ${formatIntAR(ops.roomTypes.suites)}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. RESTAURANTES (OUTLETS) -->
+        <div class="bg-white rounded-xl p-5 card-shadow border-t-4 border-amber-500 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-amber-700">2. Restaurantes (Outlets)</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-800">
+                ${formatIntAR(ops.coversOutlets)} cubiertos
+              </span>
+            </div>
+            <div class="mt-2.5 text-2xl font-extrabold text-slate-900">${formatMoney(ops.outletsRev)}</div>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-slate-100 space-y-1 text-xs text-slate-600">
+            <div class="flex justify-between">
+              <span>Promedio por cubierto:</span>
+              <strong class="text-slate-900">${formatMoney(ops.avgOutlets)}</strong>
+            </div>
+            <div class="flex justify-between">
+              <span>Desayuno Vasijas: <strong>${formatIntAR(ops.coversDetail.vasijasDesayuno)} cub.</strong></span>
+              <span class="text-amber-700 font-semibold">${formatPct((ops.outletsRev / ops.totalHotelRev) * 100)} Hotel</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. BANQUETES -->
+        <div class="bg-white rounded-xl p-5 card-shadow border-t-4 border-indigo-600 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-indigo-700">3. Banquetes & Eventos</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700">
+                ${formatIntAR(ops.coversBanquets)} cubiertos
+              </span>
+            </div>
+            <div class="mt-2.5 text-2xl font-extrabold text-slate-900">${formatMoney(ops.banquetsRev)}</div>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-slate-100 space-y-1 text-xs text-slate-600">
+            <div class="flex justify-between">
+              <span>Promedio por cubierto:</span>
+              <strong class="text-slate-900">${formatMoney(ops.avgBanquets)}</strong>
+            </div>
+            <div class="flex justify-between">
+              <span>Participación s/Total Hotel:</span>
+              <strong class="text-indigo-700">${formatPct((ops.banquetsRev / ops.totalHotelRev) * 100)}</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. FACTURACIÓN TOTAL HOTEL -->
+        <div class="bg-slate-900 text-white rounded-xl p-5 card-shadow border-t-4 border-emerald-400 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-amber-400">4. Facturación Total Hotel</span>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-800 text-emerald-300">
+                ${formatIntAR(ops.guests)} huéspedes
+              </span>
+            </div>
+            <div class="mt-2.5 text-2xl font-extrabold text-white">${formatMoney(ops.totalHotelRev)}</div>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-slate-800 space-y-1 text-xs text-slate-300">
+            <div class="flex justify-between">
+              <span>Total Cubiertos A&B + Banq:</span>
+              <strong class="text-white">${formatIntAR(ops.coversOutlets + ops.coversBanquets)} cub.</strong>
+            </div>
+            <div class="flex justify-between">
+              <span>Spa, Parking & Otros:</span>
+              <strong class="text-emerald-300">${formatMoney(ops.totalSpaRev)}</strong>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 7. PANEL DINÁMICO DE DETALLE (DESAYUNO, OUTLETS POR RESTAURANTE, HABITACIONES)
+    // =========================================================================
+    function renderSpotlight() {
+      const ops = getConsolidatedOps();
       const spotlight = document.getElementById('sector-spotlight');
+      const cd = ops.coversDetail;
+      const bf = ops.breakfastRev;
+      const bfTotalRev = bf.directSalon + bf.packageIncluded;
+      const bfAvgTicket = cd.vasijasDesayuno > 0 ? bfTotalRev / cd.vasijasDesayuno : 0;
 
-      if (state.sector === 'ALL' || state.sector === 'REVENUE') {
-        spotlight.classList.add('hidden');
-        kpiGrid.innerHTML = `
-          <div class="bg-white rounded-xl p-5 card-shadow border border-slate-200/60">
-            <div class="flex justify-between items-center">
-              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Venta Total Hotel</span>
-              ${renderVarBadge(ops.totalHotelRev, ops.totalHotelRevLy)}
-            </div>
-            <div class="mt-3 text-xl sm:text-2xl font-extrabold text-slate-900">${formatMoney(totalHotel)}</div>
-            <div class="mt-2 flex justify-between text-xs text-slate-500">
-              <span>LY: ${formatMoney(ops.totalHotelRevLy)}</span>
-              <span class="font-semibold text-indigo-600">TRevPAR: ${formatMoney(ops.trevParPhysical)}</span>
-            </div>
-          </div>
+      // Facturación por cada restaurante
+      const vasTot = getItemValue(revenueLines[4]) + getItemValue(revenueLines[5]);
+      const gioTot = getItemValue(revenueLines[6]) + getItemValue(revenueLines[7]);
+      const lobTot = getItemValue(revenueLines[8]) + getItemValue(revenueLines[9]);
+      const rsTot  = getItemValue(revenueLines[10]) + getItemValue(revenueLines[11]);
+      const banqTot = ops.banquetsRev;
 
-          <div class="bg-white rounded-xl p-5 card-shadow border border-slate-200/60">
-            <div class="flex justify-between items-center">
-              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Ocupación (${formatIntAR(ops.roomsOcc)} Hab.)</span>
-              ${renderVarBadge(ops.occPhysicalPct, ops.occLyPct, true)}
-            </div>
-            <div class="mt-3 flex items-baseline gap-2">
-              <span class="text-xl sm:text-2xl font-extrabold text-slate-900">${formatPct(ops.occPhysicalPct)}</span>
-              <span class="text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-800">${formatPct(ops.occNetPct)} s/Disp.</span>
-            </div>
-            <div class="mt-2 flex justify-between text-xs text-slate-500">
-              <span>OOO: ${formatIntAR(ops.roomsOoo)} hab.</span>
-              <span class="font-semibold text-slate-700">LY: ${formatPct(ops.occLyPct)} (${formatIntAR(ops.roomsOccLy)} hab.)</span>
-            </div>
-          </div>
+      const totalAllCovers = ops.vasijasTotalCovers + cd.giovanniCena + cd.lobbyBar + cd.roomService + cd.banquetes || 1;
 
-          <div class="bg-white rounded-xl p-5 card-shadow border border-slate-200/60">
-            <div class="flex justify-between items-center">
-              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">ADR Puro / ARR Total</span>
-              ${renderVarBadge(ops.arrTotal, ops.adrLy)}
-            </div>
-            <div class="mt-3 flex items-baseline gap-2">
-              <span class="text-xl sm:text-2xl font-extrabold text-slate-900">${formatMoney(ops.adrPure)}</span>
-            </div>
-            <div class="mt-2 flex justify-between text-xs text-slate-500">
-              <span>ARR c/Paq: <strong>${formatMoney(ops.arrTotal)}</strong></span>
-              <span class="font-semibold text-amber-600">RevPAR: ${formatMoney(ops.revParPhysical)}</span>
-            </div>
-          </div>
-
-          <div class="bg-white rounded-xl p-5 card-shadow border border-slate-200/60">
-            <div class="flex justify-between items-center">
-              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">A&B + Banquetes</span>
-              ${renderVarBadge(ops.totalABRev, ops.abRevLy)}
-            </div>
-            <div class="mt-3 text-xl sm:text-2xl font-extrabold text-slate-900">${formatMoney(totalAB)}</div>
-            <div class="mt-2 flex justify-between text-xs text-slate-500">
-              <span>${formatIntAR(ops.coversOutlets + ops.coversBanquets)} Cubiertos</span>
-              <span class="font-semibold text-purple-600">${formatPct((totalAB / totalHotel) * 100)} Hotel</span>
-            </div>
-          </div>
-        `;
-      } else if (state.sector === 'ROOMS') {
-        kpiGrid.innerHTML = `
-          <div class="bg-white rounded-xl p-5 card-shadow border-l-4 border-blue-600">
-            <div class="flex justify-between items-center">
-              <span class="text-xs font-bold uppercase text-slate-400">Total Rooms Revenue</span>
-              ${renderVarBadge(ops.totalRoomRev, ops.roomRevLy)}
-            </div>
-            <div class="mt-2 text-xl sm:text-2xl font-extrabold text-slate-900">${formatMoney(totalRooms)}</div>
-            <div class="mt-2 text-xs text-slate-500">LY: ${formatMoney(ops.roomRevLy)} · <strong>${formatPct((totalRooms / totalHotel) * 100)}</strong> Hotel</div>
-          </div>
-          <div class="bg-white rounded-xl p-5 card-shadow">
-            <span class="text-xs font-bold uppercase text-slate-400">Alojamiento Puro vs Paquetes</span>
-            <div class="mt-2 text-xl font-bold text-slate-900">${formatMoney(ops.pureRoomRev)}</div>
-            <div class="mt-2 text-xs text-amber-600 font-semibold">+ ${formatMoney(ops.pkgRoomRev)} en Paquetes</div>
-          </div>
-          <div class="bg-white rounded-xl p-5 card-shadow">
-            <span class="text-xs font-bold uppercase text-slate-400">Ocupación s/Disp. vs s/Físicas</span>
-            <div class="mt-2 flex items-baseline gap-2">
-              <span class="text-2xl font-extrabold text-blue-600">${formatPct(ops.occNetPct)}</span>
-              <span class="text-xs text-slate-500">(${formatPct(ops.occPhysicalPct)} s/${formatIntAR(ops.roomsPhysical)})</span>
-            </div>
-            <div class="mt-2 text-xs text-rose-600 font-medium">${formatIntAR(ops.roomsOoo)} hab. Fuera de Orden (OOO)</div>
-          </div>
-          <div class="bg-white rounded-xl p-5 card-shadow">
-            <span class="text-xs font-bold uppercase text-slate-400">ADR Puro & ARR c/Paquetes</span>
-            <div class="mt-2 text-xl font-extrabold text-slate-900">${formatMoney(ops.adrPure)}</div>
-            <div class="mt-2 text-xs text-slate-500">ARR Total: <strong>${formatMoney(ops.arrTotal)}</strong></div>
-          </div>
-        `;
-        spotlight.classList.remove('hidden');
+      if (state.sector === 'ROOMS') {
         const transRev = getItemValue(revenueLines[0]);
         const grpRev = getItemValue(revenueLines[1]);
         const crewRev = getItemValue(revenueLines[2]);
+
         spotlight.innerHTML = `
-          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div>
-              <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+          <div class="space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                 <i data-lucide="bed-double" class="w-4 h-4 text-blue-600"></i>
-                Desglose por Segmento de Alojamiento (${ops.label})
-              </h4>
-              <p class="text-xs text-slate-500">Tarifa promedio (ARR) calculada exactamente sobre las habitaciones ocupadas de cada segmento</p>
+                Detalle de Habitaciones Ocupadas, Tipos y Tarifas (${ops.label})
+              </h3>
+              <span class="text-xs font-semibold px-2.5 py-1 rounded bg-blue-50 text-blue-800">
+                Disp. Neta: ${formatIntAR(ops.roomsAvail)} hab. · OOO: ${formatIntAR(ops.roomsOoo)} hab.
+              </span>
             </div>
-            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="p-3.5 rounded-xl bg-blue-50/60 border border-blue-200/70">
+                <div class="text-xs font-bold text-blue-900">Habitaciones Classic / Standard</div>
+                <div class="text-xl font-extrabold text-slate-900 mt-1">${formatIntAR(ops.roomTypes.classic)} hab.</div>
+                <div class="text-xs text-slate-500 mt-0.5">${formatPct((ops.roomTypes.classic / (ops.roomsOcc || 1)) * 100)} de la ocupación</div>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
+                <div class="text-xs font-bold text-slate-800">Habitaciones Executive / Deluxe</div>
+                <div class="text-xl font-extrabold text-slate-900 mt-1">${formatIntAR(ops.roomTypes.executive)} hab.</div>
+                <div class="text-xs text-slate-500 mt-0.5">${formatPct((ops.roomTypes.executive / (ops.roomsOcc || 1)) * 100)} de la ocupación</div>
+              </div>
+              <div class="p-3.5 rounded-xl bg-amber-50/60 border border-amber-200/70">
+                <div class="text-xs font-bold text-amber-900">Suites (Junior & Gobernador)</div>
+                <div class="text-xl font-extrabold text-slate-900 mt-1">${formatIntAR(ops.roomTypes.suites)} hab.</div>
+                <div class="text-xs text-slate-500 mt-0.5">${formatPct((ops.roomTypes.suites / (ops.roomsOcc || 1)) * 100)} de la ocupación</div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-2 border-t border-slate-100 text-center">
               <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200/60">
-                <div class="text-[11px] text-slate-400">Transients (${formatIntAR(ops.transients)} hab.)</div>
+                <div class="text-[11px] text-slate-500">Transients (${formatIntAR(ops.transients)} hab.)</div>
                 <div class="text-xs font-bold text-slate-900 mt-0.5">ARR: ${formatMoney(ops.transients > 0 ? transRev / ops.transients : 0)}</div>
               </div>
               <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200/60">
-                <div class="text-[11px] text-slate-400">Grupos (${formatIntAR(ops.groups)} hab.)</div>
+                <div class="text-[11px] text-slate-500">Grupos (${formatIntAR(ops.groups)} hab.)</div>
                 <div class="text-xs font-bold text-slate-900 mt-0.5">ARR: ${formatMoney(ops.groups > 0 ? grpRev / ops.groups : 0)}</div>
               </div>
               <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200/60">
-                <div class="text-[11px] text-slate-400">Crews (${formatIntAR(ops.crews)} hab.)</div>
+                <div class="text-[11px] text-slate-500">Crews (${formatIntAR(ops.crews)} hab.)</div>
                 <div class="text-xs font-bold text-slate-900 mt-0.5">ARR: ${formatMoney(ops.crews > 0 ? crewRev / ops.crews : 0)}</div>
               </div>
               <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200/60">
-                <div class="text-[11px] text-slate-400">Complimentary</div>
-                <div class="text-xs font-bold text-slate-900 mt-0.5">${formatIntAR(ops.comp)} hab. s/cargo</div>
+                <div class="text-[11px] text-slate-500">Paquetes Alojamiento</div>
+                <div class="text-xs font-bold text-amber-700 mt-0.5">${formatMoney(ops.pkgRoomRev)}</div>
               </div>
               <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200/60">
-                <div class="text-[11px] text-slate-400">Total Huéspedes</div>
-                <div class="text-xs font-bold text-blue-700 mt-0.5">${formatIntAR(ops.guests)} personas</div>
-              </div>
-            </div>
-          </div>
-        `;
-      } else if (state.sector === 'AB') {
-        const outletsRev = revenueLines.filter(i => i.sector === 'AB' && i.category !== 'Banquetes').reduce((a, b) => a + getItemValue(b), 0);
-        const banquetsRev = revenueLines.filter(i => i.category === 'Banquetes').reduce((a, b) => a + getItemValue(b), 0);
-        const avgOutlets = ops.coversOutlets > 0 ? outletsRev / ops.coversOutlets : 0;
-        const avgBanquets = ops.coversBanquets > 0 ? banquetsRev / ops.coversBanquets : 0;
-
-        kpiGrid.innerHTML = `
-          <div class="bg-white rounded-xl p-5 card-shadow border-l-4 border-amber-500">
-            <div class="flex justify-between items-center">
-              <span class="text-xs font-bold uppercase text-slate-400">Total A&B (Outlets + Banq.)</span>
-              ${renderVarBadge(ops.totalABRev, ops.abRevLy)}
-            </div>
-            <div class="mt-2 text-xl sm:text-2xl font-extrabold text-slate-900">${formatMoney(totalAB)}</div>
-            <div class="mt-2 text-xs text-slate-500">LY: ${formatMoney(ops.abRevLy)} · <strong>${formatPct((totalAB / totalHotel) * 100)}</strong> Hotel</div>
-          </div>
-          <div class="bg-white rounded-xl p-5 card-shadow">
-            <span class="text-xs font-bold uppercase text-slate-400">Outlets Restaurantes & Bares</span>
-            <div class="mt-2 text-xl sm:text-2xl font-extrabold text-amber-600">${formatMoney(outletsRev)}</div>
-            <div class="mt-2 text-xs text-slate-500">${formatIntAR(ops.coversOutlets)} cub. · Prom: <strong>${formatMoney(avgOutlets)}</strong></div>
-          </div>
-          <div class="bg-white rounded-xl p-5 card-shadow">
-            <span class="text-xs font-bold uppercase text-slate-400">Banquetes & Convenciones</span>
-            <div class="mt-2 text-xl sm:text-2xl font-extrabold text-indigo-600">${formatMoney(banquetsRev)}</div>
-            <div class="mt-2 text-xs text-slate-500">${formatIntAR(ops.coversBanquets)} cub. · Prom: <strong>${formatMoney(avgBanquets)}</strong></div>
-          </div>
-          <div class="bg-white rounded-xl p-5 card-shadow">
-            <span class="text-xs font-bold uppercase text-slate-400">Total Cubiertos A&B</span>
-            <div class="mt-2 text-xl sm:text-2xl font-extrabold text-slate-900">${formatIntAR(ops.coversOutlets + ops.coversBanquets)}</div>
-            <div class="mt-2 text-xs text-emerald-600 font-semibold">Vasijas: ${formatIntAR(ops.vasijasCovers)} · Banq: ${formatIntAR(ops.banquetsCovers)}</div>
-          </div>
-        `;
-        spotlight.classList.remove('hidden');
-        const vasTot = getItemValue(revenueLines[4]) + getItemValue(revenueLines[5]);
-        const gioTot = getItemValue(revenueLines[6]) + getItemValue(revenueLines[7]);
-        const lobTot = getItemValue(revenueLines[8]) + getItemValue(revenueLines[9]);
-        const rsTot  = getItemValue(revenueLines[10]);
-
-        const cd = ops.coversDetail || {};
-        const totalVasijasDet = (cd.vasijasDesayuno || 0) + (cd.vasijasAlmuerzo || 0) + (cd.vasijasCena || 0);
-        const totalAllCovers = totalVasijasDet + (cd.giovanniCena || 0) + (cd.lobbyBar || 0) + (cd.roomService || 0) + (cd.banquetes || 0) || 1;
-
-        spotlight.innerHTML = `
-          <div class="space-y-5">
-            <!-- Facturación y Ticket Promedio -->
-            <div>
-              <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <i data-lucide="utensils" class="w-4 h-4 text-amber-500"></i>
-                Cubiertos y Ticket Promedio Auditado por Outlet (${ops.label})
-              </h4>
-              <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                <div class="p-3 rounded-lg bg-amber-50/60 border border-amber-200/60">
-                  <div class="text-xs font-bold text-slate-800">Las Vasijas</div>
-                  <div class="text-base font-extrabold text-slate-900 mt-1">${formatMoney(vasTot)}</div>
-                  <div class="text-[11px] text-slate-600 mt-1">${formatIntAR(ops.vasijasCovers)} cub. · Prom: <strong>${formatMoney(ops.vasijasCovers > 0 ? vasTot / ops.vasijasCovers : 0)}</strong></div>
-                </div>
-                <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/60">
-                  <div class="text-xs font-bold text-slate-800">Don Giovanni</div>
-                  <div class="text-base font-extrabold text-slate-900 mt-1">${formatMoney(gioTot)}</div>
-                  <div class="text-[11px] text-slate-600 mt-1">${formatIntAR(ops.giovanniCovers)} cub. · Prom: <strong>${formatMoney(ops.giovanniCovers > 0 ? gioTot / ops.giovanniCovers : 0)}</strong></div>
-                </div>
-                <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/60">
-                  <div class="text-xs font-bold text-slate-800">Lobby Bar</div>
-                  <div class="text-base font-extrabold text-slate-900 mt-1">${formatMoney(lobTot)}</div>
-                  <div class="text-[11px] text-slate-600 mt-1">${formatIntAR(ops.lobbyCovers)} cub. · Prom: <strong>${formatMoney(ops.lobbyCovers > 0 ? lobTot / ops.lobbyCovers : 0)}</strong></div>
-                </div>
-                <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/60">
-                  <div class="text-xs font-bold text-slate-800">Room Service</div>
-                  <div class="text-base font-extrabold text-slate-900 mt-1">${formatMoney(rsTot)}</div>
-                  <div class="text-[11px] text-slate-600 mt-1">${formatIntAR(ops.rsCovers)} cub. · Prom: <strong>${formatMoney(ops.rsCovers > 0 ? rsTot / ops.rsCovers : 0)}</strong></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- NUEVA SECCIÓN: Apertura Detallada de Cubiertos por Servicio y Turno -->
-            <div class="pt-4 border-t border-slate-200/80">
-              <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                  <i data-lucide="users" class="w-4 h-4 text-indigo-600"></i>
-                  Detalle de Cubiertos por Servicio y Turno
-                </h4>
-                <span class="text-xs font-bold px-2.5 py-1 rounded-md bg-slate-900 text-amber-400">
-                  Total General: ${formatIntAR(totalAllCovers)} cubiertos
-                </span>
-              </div>
-
-              <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
-                <div class="p-3 rounded-lg bg-amber-50/70 border border-amber-200/70">
-                  <div class="text-[11px] font-semibold text-amber-900">Vasijas · Desayuno</div>
-                  <div class="text-lg font-extrabold text-slate-900 mt-0.5">${formatIntAR(cd.vasijasDesayuno || 0)}</div>
-                  <div class="text-[10px] text-slate-500">${formatPct(((cd.vasijasDesayuno || 0) / totalAllCovers) * 100)} del total</div>
-                </div>
-                <div class="p-3 rounded-lg bg-amber-50/70 border border-amber-200/70">
-                  <div class="text-[11px] font-semibold text-amber-900">Vasijas · Almuerzo</div>
-                  <div class="text-lg font-extrabold text-slate-900 mt-0.5">${formatIntAR(cd.vasijasAlmuerzo || 0)}</div>
-                  <div class="text-[10px] text-slate-500">${formatPct(((cd.vasijasAlmuerzo || 0) / totalAllCovers) * 100)} del total</div>
-                </div>
-                <div class="p-3 rounded-lg bg-amber-50/70 border border-amber-200/70">
-                  <div class="text-[11px] font-semibold text-amber-900">Vasijas · Cena</div>
-                  <div class="text-lg font-extrabold text-slate-900 mt-0.5">${formatIntAR(cd.vasijasCena || 0)}</div>
-                  <div class="text-[10px] text-slate-500">${formatPct(((cd.vasijasCena || 0) / totalAllCovers) * 100)} del total</div>
-                </div>
-                <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/70">
-                  <div class="text-[11px] font-semibold text-slate-700">Don Giovanni · Cena</div>
-                  <div class="text-lg font-extrabold text-slate-900 mt-0.5">${formatIntAR(cd.giovanniCena || 0)}</div>
-                  <div class="text-[10px] text-slate-500">${formatPct(((cd.giovanniCena || 0) / totalAllCovers) * 100)} del total</div>
-                </div>
-                <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/70">
-                  <div class="text-[11px] font-semibold text-slate-700">Lobby Bar</div>
-                  <div class="text-lg font-extrabold text-slate-900 mt-0.5">${formatIntAR(cd.lobbyBar || 0)}</div>
-                  <div class="text-[10px] text-slate-500">${formatPct(((cd.lobbyBar || 0) / totalAllCovers) * 100)} del total</div>
-                </div>
-                <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/70">
-                  <div class="text-[11px] font-semibold text-slate-700">Room Service</div>
-                  <div class="text-lg font-extrabold text-slate-900 mt-0.5">${formatIntAR(cd.roomService || 0)}</div>
-                  <div class="text-[10px] text-slate-500">${formatPct(((cd.roomService || 0) / totalAllCovers) * 100)} del total</div>
-                </div>
-                <div class="p-3 rounded-lg bg-indigo-50/70 border border-indigo-200/70">
-                  <div class="text-[11px] font-semibold text-indigo-900">Banquetes</div>
-                  <div class="text-lg font-extrabold text-indigo-950 mt-0.5">${formatIntAR(cd.banquetes || 0)}</div>
-                  <div class="text-[10px] text-indigo-700">${formatPct(((cd.banquetes || 0) / totalAllCovers) * 100)} del total</div>
-                </div>
+                <div class="text-[11px] text-slate-500">Alojamiento Puro</div>
+                <div class="text-xs font-bold text-blue-700 mt-0.5">${formatMoney(ops.pureRoomRev)}</div>
               </div>
             </div>
           </div>
@@ -1253,40 +913,194 @@
         const hcPass = getItemValue(revenueLines[16]);
         const park   = getItemValue(revenueLines[17]);
         const minor  = getItemValue(revenueLines[18]);
-        spotlight.classList.add('hidden');
-        kpiGrid.innerHTML = `
-          <div class="bg-white rounded-xl p-5 card-shadow border-l-4 border-emerald-500">
-            <div class="flex justify-between items-center">
-              <span class="text-xs font-bold uppercase text-slate-400">Total Spa, Parking & Otros</span>
-              ${renderVarBadge(ops.totalSpaRev, ops.otherRevLy)}
+        spotlight.innerHTML = `
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-4 h-4 text-emerald-600"></i>
+              Detalle Spa, Health Club, Parking & Otros (${ops.label})
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+              <div class="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200/70">
+                <div class="text-xs font-bold text-emerald-900">Health Club — Paquetes</div>
+                <div class="text-lg font-extrabold text-slate-900 mt-1">${formatMoney(hcPack)}</div>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
+                <div class="text-xs font-bold text-slate-800">Pases Diarios, Masajes e Iobella</div>
+                <div class="text-lg font-extrabold text-slate-900 mt-1">${formatMoney(hcPass)}</div>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
+                <div class="text-xs font-bold text-slate-800">Estacionamiento (Parking)</div>
+                <div class="text-lg font-extrabold text-slate-900 mt-1">${formatMoney(park)}</div>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
+                <div class="text-xs font-bold text-slate-800">Lavandería, Internet y Otros</div>
+                <div class="text-lg font-extrabold text-slate-900 mt-1">${formatMoney(minor)}</div>
+              </div>
             </div>
-            <div class="mt-2 text-xl sm:text-2xl font-extrabold text-slate-900">${formatMoney(totalSpa)}</div>
-            <div class="mt-2 text-xs text-slate-500">LY: ${formatMoney(ops.otherRevLy)} · <strong>${formatPct((totalSpa / totalHotel) * 100)}</strong> Hotel</div>
           </div>
-          <div class="bg-white rounded-xl p-5 card-shadow">
-            <span class="text-xs font-bold uppercase text-slate-400">Health Club & Spa Total</span>
-            <div class="mt-2 text-xl sm:text-2xl font-extrabold text-emerald-600">${formatMoney(hcPack + hcPass)}</div>
-            <div class="mt-2 text-xs text-slate-500">Paquetes: ${formatMoney(hcPack)}</div>
+        `;
+      } else {
+        // VISTA CONSOLIDADA ('ALL') O RESTAURANTES & BANQUETES ('AB')
+        const outletsList = [
+          { id: 'ALL', label: 'Todos los Restaurantes & Banq.' },
+          { id: 'Las Vasijas', label: 'Las Vasijas' },
+          { id: 'Don Giovanni', label: 'Don Giovanni' },
+          { id: 'Lobby Bar', label: 'Lobby Bar' },
+          { id: 'Room Service', label: 'Room Service' },
+          { id: 'Banquetes', label: 'Banquetes' }
+        ];
+
+        const filterPills = state.sector === 'AB' ? `
+          <div class="flex flex-wrap items-center gap-1.5 mb-4 pb-3 border-b border-slate-100">
+            <span class="text-xs font-semibold text-slate-500 mr-1">Filtrar Restaurante:</span>
+            ${outletsList.map(o => `
+              <button onclick="setOutletFilter('${o.id}')"
+                class="outlet-pill ${state.outletFilter === o.id ? 'active' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-transparent'} px-3 py-1.5 rounded-lg text-xs border transition">
+                ${o.label}
+              </button>
+            `).join('')}
           </div>
-          <div class="bg-white rounded-xl p-5 card-shadow">
-            <span class="text-xs font-bold uppercase text-slate-400">Estacionamiento (Parking)</span>
-            <div class="mt-2 text-xl sm:text-2xl font-extrabold text-slate-900">${formatMoney(park)}</div>
-            <div class="mt-2 text-xs text-slate-500">Cocheras diarias y eventos</div>
-          </div>
-          <div class="bg-white rounded-xl p-5 card-shadow">
-            <span class="text-xs font-bold uppercase text-slate-400">Lavandería, Internet y Minibar</span>
-            <div class="mt-2 text-xl sm:text-2xl font-extrabold text-slate-900">${formatMoney(minor)}</div>
-            <div class="mt-2 text-xs text-emerald-600 font-semibold">Internet 18/11 corregido</div>
+        ` : '';
+
+        spotlight.innerHTML = `
+          <div class="space-y-5">
+            ${filterPills}
+
+            <!-- MONITOR DE DESAYUNO (LAS VASIJAS: CUBIERTOS + FACTURACIÓN DIRECTA VS PAQUETES) -->
+            <div class="p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50/60 border border-amber-200">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <h4 class="text-sm font-bold text-amber-950 flex items-center gap-2">
+                  <i data-lucide="coffee" class="w-4 h-4 text-amber-600"></i>
+                  Monitor de Desayunos — Las Vasijas (${ops.label})
+                </h4>
+                <span class="text-xs font-bold px-2.5 py-1 rounded-md bg-amber-500 text-slate-950">
+                  Ticket Promedio Desayuno: ${formatMoney(bfAvgTicket)}
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div class="bg-white/90 p-3 rounded-lg border border-amber-200/80">
+                  <div class="text-[11px] font-semibold text-slate-500 uppercase">Cubiertos Desayuno</div>
+                  <div class="text-xl font-extrabold text-slate-900 mt-0.5">${formatIntAR(cd.vasijasDesayuno)} cub.</div>
+                  <div class="text-[11px] text-amber-800 mt-0.5">Turno mañana Las Vasijas</div>
+                </div>
+                <div class="bg-white/90 p-3 rounded-lg border border-amber-200/80">
+                  <div class="text-[11px] font-semibold text-slate-500 uppercase">Facturación Directa (Salón)</div>
+                  <div class="text-xl font-extrabold text-slate-900 mt-0.5">${formatMoney(bf.directSalon)}</div>
+                  <div class="text-[11px] text-slate-500 mt-0.5">Pago diferencial / Walk-in</div>
+                </div>
+                <div class="bg-white/90 p-3 rounded-lg border border-amber-200/80">
+                  <div class="text-[11px] font-semibold text-slate-500 uppercase">Incluido en Paquete Hab.</div>
+                  <div class="text-xl font-extrabold text-blue-700 mt-0.5">${formatMoney(bf.packageIncluded)}</div>
+                  <div class="text-[11px] text-slate-500 mt-0.5">Imputado desde Cód. 199</div>
+                </div>
+                <div class="bg-slate-900 text-white p-3 rounded-lg">
+                  <div class="text-[11px] font-semibold text-amber-400 uppercase">Facturación Total Desayuno</div>
+                  <div class="text-xl font-extrabold text-white mt-0.5">${formatMoney(bfTotalRev)}</div>
+                  <div class="text-[11px] text-slate-300 mt-0.5">Directo + Paquetes Alojamiento</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RENDIMIENTO POR RESTAURANTE (CUBIERTOS, FACTURACIÓN Y PROMEDIO) -->
+            <div>
+              <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <i data-lucide="utensils" class="w-4 h-4 text-amber-500"></i>
+                Facturación, Cubiertos y Ticket Promedio por Restaurante
+              </h4>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                <div class="p-3 rounded-xl bg-amber-50/50 border border-amber-200/70">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-900">Las Vasijas</span>
+                    <span class="text-[11px] font-bold text-amber-800">${formatIntAR(ops.vasijasTotalCovers)} cub.</span>
+                  </div>
+                  <div class="text-base font-extrabold text-slate-900 mt-1">${formatMoney(vasTot)}</div>
+                  <div class="text-[11px] text-slate-600 mt-1">Prom: <strong>${formatMoney(ops.vasijasTotalCovers > 0 ? vasTot / ops.vasijasTotalCovers : 0)}</strong></div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-900">Don Giovanni</span>
+                    <span class="text-[11px] font-bold text-slate-700">${formatIntAR(cd.giovanniCena)} cub.</span>
+                  </div>
+                  <div class="text-base font-extrabold text-slate-900 mt-1">${formatMoney(gioTot)}</div>
+                  <div class="text-[11px] text-slate-600 mt-1">Prom: <strong>${formatMoney(cd.giovanniCena > 0 ? gioTot / cd.giovanniCena : 0)}</strong></div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-900">Lobby Bar</span>
+                    <span class="text-[11px] font-bold text-slate-700">${formatIntAR(cd.lobbyBar)} cub.</span>
+                  </div>
+                  <div class="text-base font-extrabold text-slate-900 mt-1">${formatMoney(lobTot)}</div>
+                  <div class="text-[11px] text-slate-600 mt-1">Prom: <strong>${formatMoney(cd.lobbyBar > 0 ? lobTot / cd.lobbyBar : 0)}</strong></div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-900">Room Service</span>
+                    <span class="text-[11px] font-bold text-slate-700">${formatIntAR(cd.roomService)} cub.</span>
+                  </div>
+                  <div class="text-base font-extrabold text-slate-900 mt-1">${formatMoney(rsTot)}</div>
+                  <div class="text-[11px] text-slate-600 mt-1">Prom: <strong>${formatMoney(cd.roomService > 0 ? rsTot / cd.roomService : 0)}</strong></div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-indigo-50/60 border border-indigo-200/70">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-indigo-950">Banquetes</span>
+                    <span class="text-[11px] font-bold text-indigo-800">${formatIntAR(cd.banquetes)} cub.</span>
+                  </div>
+                  <div class="text-base font-extrabold text-indigo-950 mt-1">${formatMoney(banqTot)}</div>
+                  <div class="text-[11px] text-indigo-800 mt-1">Prom: <strong>${formatMoney(cd.banquetes > 0 ? banqTot / cd.banquetes : 0)}</strong></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- APERTURA DETALLADA DE CUBIERTOS POR TURNO -->
+            <div class="pt-3 border-t border-slate-100">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-600">Detalle de Cubiertos por Turno y Servicio</span>
+                <span class="text-xs font-bold text-slate-900">Total General: ${formatIntAR(totalAllCovers)} cubiertos</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+                <div class="p-2.5 rounded-lg bg-amber-50/70 border border-amber-200/70">
+                  <div class="text-[11px] font-semibold text-amber-900">Vasijas · Desayuno</div>
+                  <div class="text-base font-extrabold text-slate-900">${formatIntAR(cd.vasijasDesayuno)}</div>
+                </div>
+                <div class="p-2.5 rounded-lg bg-amber-50/70 border border-amber-200/70">
+                  <div class="text-[11px] font-semibold text-amber-900">Vasijas · Almuerzo</div>
+                  <div class="text-base font-extrabold text-slate-900">${formatIntAR(cd.vasijasAlmuerzo)}</div>
+                </div>
+                <div class="p-2.5 rounded-lg bg-amber-50/70 border border-amber-200/70">
+                  <div class="text-[11px] font-semibold text-amber-900">Vasijas · Cena</div>
+                  <div class="text-base font-extrabold text-slate-900">${formatIntAR(cd.vasijasCena)}</div>
+                </div>
+                <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200/70">
+                  <div class="text-[11px] font-semibold text-slate-700">Don Giovanni</div>
+                  <div class="text-base font-extrabold text-slate-900">${formatIntAR(cd.giovanniCena)}</div>
+                </div>
+                <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200/70">
+                  <div class="text-[11px] font-semibold text-slate-700">Lobby Bar</div>
+                  <div class="text-base font-extrabold text-slate-900">${formatIntAR(cd.lobbyBar)}</div>
+                </div>
+                <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200/70">
+                  <div class="text-[11px] font-semibold text-slate-700">Room Service</div>
+                  <div class="text-base font-extrabold text-slate-900">${formatIntAR(cd.roomService)}</div>
+                </div>
+                <div class="p-2.5 rounded-lg bg-indigo-50/70 border border-indigo-200/70">
+                  <div class="text-[11px] font-semibold text-indigo-900">Banquetes</div>
+                  <div class="text-base font-extrabold text-indigo-950">${formatIntAR(cd.banquetes)}</div>
+                </div>
+              </div>
+            </div>
           </div>
         `;
       }
-
-      renderRevenueYoYSection(ops);
       lucide.createIcons();
     }
 
     // =========================================================================
-    // 8. GRÁFICOS INTERACTIVOS (EVOLUCIÓN DIARIA CON COMPARATIVA LY + MIX)
+    // 8. GRÁFICOS LIMPIOS (SOLO 2026, SIN COMPARATIVA AÑO PASADO)
     // =========================================================================
     let trendChartInstance = null;
     let mixChartInstance = null;
@@ -1296,19 +1110,11 @@
       const rate = state.currency === 'ARS' ? 1 : EXCHANGE_RATE;
       const dayLabels = DATES_LIST.map(d => dailyOps[d].short);
 
-      const dayValues2026ARS = DATES_LIST.map(d =>
+      const dayValuesARS = DATES_LIST.map(d =>
         filtered.reduce((acc, item) => acc + (item.days[d] || 0), 0)
       );
 
-      const dayValuesLyARS = DATES_LIST.map(d => {
-        const o = dailyOps[d];
-        if (state.sector === 'ROOMS') return o.roomRevLy;
-        if (state.sector === 'AB') return o.abRevLy;
-        if (state.sector === 'SPA') return o.otherRevLy;
-        return o.roomRevLy + o.abRevLy + o.otherRevLy;
-      });
-
-      const sum8DaysARS = dayValues2026ARS.reduce((a, b) => a + b, 0);
+      const sum8DaysARS = dayValuesARS.reduce((a, b) => a + b, 0);
       document.getElementById('trend-sum-badge').innerText = `Cons. 8 Días: ${formatMoney(sum8DaysARS)}`;
 
       const barColors = DATES_LIST.map(d =>
@@ -1321,22 +1127,13 @@
         type: 'bar',
         data: {
           labels: dayLabels,
-          datasets: [
-            {
-              label: `Actual 2026 (${state.currency})`,
-              data: dayValues2026ARS.map(v => v / rate),
-              backgroundColor: barColors,
-              borderRadius: 6,
-              maxBarThickness: 34
-            },
-            {
-              label: `Año Pasado LY (${state.currency})`,
-              data: dayValuesLyARS.map(v => v / rate),
-              backgroundColor: '#cbd5e1',
-              borderRadius: 6,
-              maxBarThickness: 24
-            }
-          ]
+          datasets: [{
+            label: `Facturación (${state.currency})`,
+            data: dayValuesARS.map(v => v / rate),
+            backgroundColor: barColors,
+            borderRadius: 6,
+            maxBarThickness: 38
+          }]
         },
         options: {
           responsive: true,
@@ -1349,13 +1146,11 @@
             }
           },
           plugins: {
-            legend: { display: true, position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+            legend: { display: false },
             tooltip: {
               callbacks: {
                 label: function(ctx) {
-                  const rawARS = ctx.datasetIndex === 0 ? dayValues2026ARS[ctx.dataIndex] : dayValuesLyARS[ctx.dataIndex];
-                  const tag = ctx.datasetIndex === 0 ? '2026' : 'Año Pasado (LY)';
-                  return ` ${tag}: ${formatMoney(rawARS)}`;
+                  return ` Facturación: ${formatMoney(dayValuesARS[ctx.dataIndex])}`;
                 }
               }
             }
@@ -1378,9 +1173,10 @@
         }
       });
 
+      // Gráfico de participación
       const grouped = {};
       filtered.forEach(item => {
-        const key = (state.sector === 'ALL' || state.sector === 'REVENUE')
+        const key = state.sector === 'ALL'
           ? (item.sector === 'ROOMS' ? 'Habitaciones' : item.sector === 'AB' ? 'Restaurantes & Banq.' : 'Spa, Parking & Otros')
           : item.category;
         grouped[key] = (grouped[key] || 0) + getItemValue(item);
@@ -1438,7 +1234,7 @@
     }
 
     // =========================================================================
-    // 9. TABLA CONCILIADA DE RUBROS
+    // 9. TABLA DE FACTURACIÓN
     // =========================================================================
     function renderTable() {
       const search = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -1494,7 +1290,7 @@
       const footerShare = (sumActive / sectorTotalActive) * 100;
       document.getElementById('tableFoot').innerHTML = `
         <tr>
-          <td class="py-3.5 px-4">TOTAL CONCILIADO (${rows.length} rubros)</td>
+          <td class="py-3.5 px-4">TOTAL (${rows.length} conceptos)</td>
           <td class="py-3.5 px-4 text-right">${formatMoney(sumDay)}</td>
           <td class="py-3.5 px-4 text-right">${formatMoney(sumCons8)}</td>
           <td class="py-3.5 px-4 text-right">${formatMoney(sumMtd)}</td>
@@ -1506,7 +1302,8 @@
     }
 
     function updateAll() {
-      renderKPIs();
+      renderHeroSummary();
+      renderSpotlight();
       renderCharts();
       renderTable();
     }
