@@ -3,221 +3,208 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reporte Daily Ejecutivo | Sheraton Pilar</title>
-  <!-- Tailwind CSS para diseño moderno y responsive -->
+  <title>Tablero Daily Interactivo | Sheraton Pilar</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js para gráficos interactivos -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-    .card-shadow { box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06); }
-    .active-tab { background-color: #0f172a; color: #ffffff; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+    .card-shadow { box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05); }
+    .sector-btn.active {
+      background-color: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    }
   </style>
 </head>
-<body class="text-slate-800 antialiased pb-12">
+<body class="text-slate-800 antialiased pb-16">
 
-  <!-- HEADER EJECUTIVO -->
-  <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+  <!-- HEADER SUPERIOR -->
+  <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+      
+      <!-- Identidad -->
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg bg-amber-500 flex items-center justify-center font-bold text-slate-900 text-xl">
+        <div class="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center font-extrabold text-slate-900 text-xl shadow">
           S
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-lg sm:text-xl font-bold tracking-tight">SHERATON PILAR HOTEL & CONVENTION CENTER</h1>
-            <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-              Opera PMS Sync
+            <h1 class="text-base sm:text-lg font-bold tracking-tight">SHERATON PILAR · DAILY ANALYTICS</h1>
+            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              Opera PMS
             </span>
           </div>
-          <p class="text-xs text-slate-400">
-            Fecha de Datos: <strong class="text-slate-200">Martes 17/11/2026</strong> · Fecha de Negocio: <strong class="text-slate-200">18/11/2026</strong> · TC Opera: <strong class="text-amber-400">\$1.500 ARS/USD</strong>
+          <p class="text-xs text-slate-400" id="header-subtitle">
+            Base Histórica Daily · TC Opera: <strong class="text-amber-400">$1.500 ARS/USD</strong>
           </p>
         </div>
       </div>
 
-      <!-- CONTROLES INTERACTIVOS (PERÍODO Y MONEDA) -->
+      <!-- BARRA DE FILTROS DE TIEMPO Y MONEDA -->
       <div class="flex flex-wrap items-center gap-2">
-        <!-- Selector Período -->
-        <div class="bg-slate-800 p-1 rounded-lg flex text-xs font-medium border border-slate-700">
-          <button onclick="setPeriod('day')" id="btn-day" class="px-3 py-1.5 rounded-md transition bg-amber-500 text-slate-900 font-semibold">
-            Día (17/11)
+        
+        <!-- Navegador de Día Puntual -->
+        <div id="day-navigator" class="flex items-center bg-slate-800 rounded-lg p-1 border border-slate-700">
+          <button onclick="stepDay(-1)" class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-700 rounded-md transition" title="Día anterior">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
           </button>
-          <button onclick="setPeriod('mtd')" id="btn-mtd" class="px-3 py-1.5 rounded-md transition text-slate-300 hover:text-white">
+          <div class="flex items-center gap-1.5 px-2">
+            <i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-400"></i>
+            <select id="dateSelect" onchange="onDateChange(this.value)" class="bg-transparent text-xs font-semibold text-white focus:outline-none cursor-pointer">
+              <option value="2026-11-17" class="bg-slate-900 text-white">Mar 17/11/2026 (Cierre Opera)</option>
+              <option value="2026-11-16" class="bg-slate-900 text-white">Lun 16/11/2026</option>
+              <option value="2026-11-15" class="bg-slate-900 text-white">Dom 15/11/2026</option>
+              <option value="2026-11-14" class="bg-slate-900 text-white">Sáb 14/11/2026</option>
+              <option value="2026-11-13" class="bg-slate-900 text-white">Vie 13/11/2026</option>
+            </select>
+          </div>
+          <button onclick="stepDay(1)" class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-700 rounded-md transition" title="Día siguiente">
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Selector de Modo (Día vs Consolidados) -->
+        <div class="bg-slate-800 p-1 rounded-lg flex text-xs font-medium border border-slate-700">
+          <button onclick="setMode('day')" id="mode-day" class="px-2.5 py-1.5 rounded-md transition bg-amber-500 text-slate-900 font-semibold">
+            Movimiento Diario
+          </button>
+          <button onclick="setMode('week')" id="mode-week" class="px-2.5 py-1.5 rounded-md transition text-slate-300 hover:text-white">
+            Cons. 5 Días
+          </button>
+          <button onclick="setMode('mtd')" id="mode-mtd" class="px-2.5 py-1.5 rounded-md transition text-slate-300 hover:text-white">
             Mes (MTD)
           </button>
-          <button onclick="setPeriod('ytd')" id="btn-ytd" class="px-3 py-1.5 rounded-md transition text-slate-300 hover:text-white">
+          <button onclick="setMode('ytd')" id="mode-ytd" class="px-2.5 py-1.5 rounded-md transition text-slate-300 hover:text-white">
             Año (YTD)
           </button>
         </div>
 
         <!-- Selector Moneda -->
         <div class="bg-slate-800 p-1 rounded-lg flex text-xs font-medium border border-slate-700">
-          <button onclick="setCurrency('ARS')" id="btn-ars" class="px-3 py-1.5 rounded-md transition bg-white text-slate-900 font-semibold">
-            ARS ($)
+          <button onclick="setCurrency('ARS')" id="curr-ars" class="px-2.5 py-1.5 rounded-md transition bg-white text-slate-900 font-semibold">
+            ARS $
           </button>
-          <button onclick="setCurrency('USD')" id="btn-usd" class="px-3 py-1.5 rounded-md transition text-slate-300 hover:text-white">
-            USD (u$s)
+          <button onclick="setCurrency('USD')" id="curr-usd" class="px-2.5 py-1.5 rounded-md transition text-slate-300 hover:text-white">
+            USD u$s
           </button>
         </div>
+
       </div>
     </div>
   </header>
 
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6">
 
-    <!-- TARJETAS KPI PRINCIPALES -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <!-- KPI 1: Venta Total -->
-      <div class="bg-white rounded-xl p-5 card-shadow border border-slate-100">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400" id="kpi-rev-label">Venta Total Hotel (Día)</span>
-          <span class="p-2 rounded-lg bg-emerald-50 text-emerald-600"><i data-lucide="dollar-sign" class="w-4 h-4"></i></span>
-        </div>
-        <div class="mt-3 flex items-baseline gap-2">
-          <h2 class="text-2xl font-bold text-slate-900" id="kpi-total-rev">\$57.635.343</h2>
-        </div>
-        <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
-          <span id="kpi-rev-sub">Equiv: u$s 38.424</span>
-          <span class="text-emerald-600 font-medium">100% Ingresos Netos</span>
-        </div>
+    <!-- PESTAÑAS DE FILTRO RÁPIDO POR UNIDAD DE NEGOCIO -->
+    <section class="flex flex-wrap items-center justify-between gap-3 bg-white p-2.5 rounded-xl card-shadow border border-slate-200/80">
+      <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+        <button onclick="setSector('ALL')" id="sec-ALL" class="sector-btn active flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold border border-transparent transition">
+          <i data-lucide="layout-dashboard" class="w-4 h-4 text-amber-400"></i>
+          Consolidado Hotel
+        </button>
+        <button onclick="setSector('ROOMS')" id="sec-ROOMS" class="sector-btn flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200/70 transition">
+          <i data-lucide="bed-double" class="w-4 h-4 text-blue-600"></i>
+          Habitaciones (Rooms)
+        </button>
+        <button onclick="setSector('AB')" id="sec-AB" class="sector-btn flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200/70 transition">
+          <i data-lucide="utensils" class="w-4 h-4 text-amber-600"></i>
+          Restaurantes & Banquetes
+        </button>
+        <button onclick="setSector('SPA')" id="sec-SPA" class="sector-btn flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200/70 transition">
+          <i data-lucide="sparkles" class="w-4 h-4 text-emerald-600"></i>
+          Spa, Health Club & Otros
+        </button>
       </div>
 
-      <!-- KPI 2: Ocupación -->
-      <div class="bg-white rounded-xl p-5 card-shadow border border-slate-100">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Ocupación Hotel</span>
-          <span class="p-2 rounded-lg bg-blue-50 text-blue-600"><i data-lucide="bed-double" class="w-4 h-4"></i></span>
-        </div>
-        <div class="mt-3 flex items-baseline gap-2">
-          <h2 class="text-2xl font-bold text-slate-900" id="kpi-occ-physical">79,29%</h2>
-          <span class="text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-800" id="kpi-occ-net">98,23% s/Disp.</span>
-        </div>
-        <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
-          <span id="kpi-rooms-detail">111 Ocup. / 140 Físicas (27 OOO)</span>
-          <span class="text-emerald-600 font-medium" id="kpi-occ-ly">LY: 66,43%</span>
-        </div>
-      </div>
-
-      <!-- KPI 3: Tarifa Promedio & RevPAR -->
-      <div class="bg-white rounded-xl p-5 card-shadow border border-slate-100">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">ADR Puro / ARR Total</span>
-          <span class="p-2 rounded-lg bg-amber-50 text-amber-600"><i data-lucide="trending-up" class="w-4 h-4"></i></span>
-        </div>
-        <div class="mt-3 flex items-baseline gap-2">
-          <h2 class="text-2xl font-bold text-slate-900" id="kpi-adr">\$199.779</h2>
-          <span class="text-xs text-slate-500" id="kpi-arr-total">ARR c/Paq: \$225.014</span>
-        </div>
-        <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
-          <span id="kpi-revpar">RevPAR: \$196.243</span>
-          <span class="text-emerald-600 font-medium" id="kpi-adr-ly">+24,3% vs LY</span>
-        </div>
-      </div>
-
-      <!-- KPI 4: Cubiertos y A&B -->
-      <div class="bg-white rounded-xl p-5 card-shadow border border-slate-100">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total A&B (Outlets + Banq.)</span>
-          <span class="p-2 rounded-lg bg-purple-50 text-purple-600"><i data-lucide="utensils" class="w-4 h-4"></i></span>
-        </div>
-        <div class="mt-3 flex items-baseline gap-2">
-          <h2 class="text-2xl font-bold text-slate-900" id="kpi-ab-rev">\$28.933.519</h2>
-        </div>
-        <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
-          <span id="kpi-covers">501 Cubiertos (375 Out. / 126 Banq.)</span>
-          <span class="text-purple-600 font-medium" id="kpi-ab-share">50,2% del Hotel</span>
-        </div>
+      <div class="hidden md:flex items-center gap-2 text-xs text-slate-500 px-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span id="active-filter-badge">Viendo: Consolidado Total · Mar 17/11/2026</span>
       </div>
     </section>
 
-    <!-- BARRA DE INDICADORES OPERATIVOS DE HABITACIONES -->
-    <section class="bg-white rounded-xl p-4 card-shadow border border-slate-100">
-      <div class="flex flex-wrap items-center justify-between gap-4 text-xs sm:text-sm">
-        <div class="flex items-center gap-2 font-semibold text-slate-700">
-          <i data-lucide="activity" class="w-4 h-4 text-amber-500"></i>
-          <span> Radiografía Operativa (F138):</span>
-        </div>
-        <div class="flex flex-wrap gap-4 sm:gap-6">
-          <div><span class="text-slate-400">Transients:</span> <strong class="text-slate-800" id="stat-transients">97 hab.</strong></div>
-          <div><span class="text-slate-400">Grupos:</span> <strong class="text-slate-800" id="stat-groups">11 hab.</strong></div>
-          <div><span class="text-slate-400">Tripulación (Crews):</span> <strong class="text-slate-800" id="stat-crews">3 hab.</strong></div>
-          <div><span class="text-slate-400">Huéspedes (Personas):</span> <strong class="text-slate-800" id="stat-guests">178 pax</strong></div>
-          <div><span class="text-slate-400">Llegadas / Salidas:</span> <strong class="text-slate-800" id="stat-mov">80 In / 37 Out</strong></div>
-          <div><span class="text-slate-400">Fuera de Orden (OOO):</span> <strong class="text-rose-600" id="stat-ooo">27 hab.</strong></div>
-        </div>
-      </div>
+    <!-- TARJETAS DINÁMICAS DE KPI (Cambian según el Sector y el Día/Período) -->
+    <section id="kpi-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Renderizado por JS -->
     </section>
 
-    <!-- GRÁFICOS INTERACTIVOS -->
+    <!-- PANEL ESPECIALIZADO POR SECTOR (Aparece al filtrar Habitaciones, A&B o Spa) -->
+    <section id="sector-spotlight" class="hidden bg-white rounded-xl p-5 card-shadow border border-slate-200/70">
+      <!-- Renderizado por JS -->
+    </section>
+
+    <!-- SECCIÓN DE GRÁFICOS DINÁMICOS -->
     <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <!-- Composición por Departamento -->
-      <div class="bg-white rounded-xl p-5 card-shadow border border-slate-100 lg:col-span-5 flex flex-col justify-between">
-        <div>
-          <h3 class="text-base font-bold text-slate-800">Mix de Ventas por Departamento</h3>
-          <p class="text-xs text-slate-400 mb-4">Participación porcentual sobre la facturación neta</p>
-        </div>
-        <div class="relative h-64 flex items-center justify-center">
-          <canvas id="deptChart"></canvas>
-        </div>
-        <div class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs text-slate-600" id="dept-legend"></div>
-      </div>
-
-      <!-- Desglose Outlets y Centros de Facturación -->
-      <div class="bg-white rounded-xl p-5 card-shadow border border-slate-100 lg:col-span-7">
+      
+      <!-- Gráfico Izquierdo: Evolución Diaria o Desglose -->
+      <div class="bg-white rounded-xl p-5 card-shadow border border-slate-200/60 lg:col-span-7 flex flex-col justify-between">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
-            <h3 class="text-base font-bold text-slate-800">Rendimiento de Outlets A&B y Banquetes</h3>
-            <p class="text-xs text-slate-400">Comparativa de ingresos por punto de venta (Alimentos, Bebidas y Salones)</p>
+            <h3 class="text-base font-bold text-slate-800" id="left-chart-title">Evolución de Movimientos Diarios (13/11 al 17/11)</h3>
+            <p class="text-xs text-slate-400" id="left-chart-sub">Hacé clic en cualquier día del selector superior para inspeccionar su detalle</p>
           </div>
-          <span class="text-xs font-medium px-2.5 py-1 rounded bg-slate-100 text-slate-600" id="chart-currency-badge">Valores en ARS</span>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 text-slate-700" id="left-chart-badge">Tendencia Diaria</span>
         </div>
         <div class="relative h-72">
-          <canvas id="outletsChart"></canvas>
+          <canvas id="trendChart"></canvas>
         </div>
       </div>
+
+      <!-- Gráfico Derecho: Mix del Sector Activo -->
+      <div class="bg-white rounded-xl p-5 card-shadow border border-slate-200/60 lg:col-span-5 flex flex-col justify-between">
+        <div>
+          <h3 class="text-base font-bold text-slate-800" id="right-chart-title">Distribución de Ingresos</h3>
+          <p class="text-xs text-slate-400 mb-3" id="right-chart-sub">Participación por centro de facturación en el período</p>
+        </div>
+        <div class="relative h-60 flex items-center justify-center">
+          <canvas id="mixChart"></canvas>
+        </div>
+        <div id="mix-legend" class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs"></div>
+      </div>
+
     </section>
 
-    <!-- TABLA DETALLADA POR SECTOR Y CENTRO DE COSTO -->
-    <section class="bg-white rounded-xl card-shadow border border-slate-100 overflow-hidden">
+    <!-- TABLA DETALLADA CON BUSCADOR Y COMPARATIVA -->
+    <section class="bg-white rounded-xl card-shadow border border-slate-200/60 overflow-hidden">
       <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h3 class="text-base font-bold text-slate-800">Detalle Ejecutivo de Ventas (Día vs. MTD vs. YTD)</h3>
-          <p class="text-xs text-slate-400">Incluye las aperturas de Opera PMS (incorporando La Federala y Pool Snack en acumulados)</p>
+          <h3 class="text-base font-bold text-slate-800" id="table-title">Apertura Detallada de Ingresos y KPIs</h3>
+          <p class="text-xs text-slate-400">Comparativa entre el Día seleccionado, Consolidado 5 días, Acumulado Mensual (MTD) y Anual (YTD)</p>
         </div>
-        <!-- Filtro por departamento -->
-        <div class="flex items-center gap-2">
-          <select id="deptFilter" onchange="renderTable()" class="text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-amber-500">
-            <option value="ALL">Todos los Departamentos</option>
-            <option value="HABITACIONES">Habitaciones (Rooms)</option>
-            <option value="OUTLETS A&B">Outlets A&B</option>
-            <option value="BANQUETES">Banquetes y Eventos</option>
-            <option value="OTROS">Health Club, Parking y Otros</option>
-          </select>
+
+        <!-- Buscador rápido -->
+        <div class="relative w-full sm:w-64">
+          <input
+            type="text"
+            id="searchInput"
+            oninput="renderTable()"
+            placeholder="Buscar outlet, salón, spa..."
+            class="w-full text-xs border border-slate-200 rounded-lg pl-8 pr-3 py-2 bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          />
+          <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
         </div>
       </div>
 
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-200">
-              <th class="py-3.5 px-4 font-semibold">Departamento / Rubro</th>
-              <th class="py-3.5 px-4 font-semibold text-right">Venta Día (17/11)</th>
-              <th class="py-3.5 px-4 font-semibold text-right">Acum. Mes (MTD)</th>
-              <th class="py-3.5 px-4 font-semibold text-right">Acum. Año (YTD)</th>
-              <th class="py-3.5 px-4 font-semibold text-right">% Share (Período)</th>
-              <th class="py-3.5 px-4 font-semibold text-center">KPI Operativo</th>
+            <tr class="bg-slate-50 text-slate-500 text-[11px] uppercase tracking-wider border-b border-slate-200">
+              <th class="py-3.5 px-4 font-semibold">Sector / Punto de Venta</th>
+              <th class="py-3.5 px-4 font-semibold text-right" id="th-day">Día Selecc.</th>
+              <th class="py-3.5 px-4 font-semibold text-right">Cons. 5 Días</th>
+              <th class="py-3.5 px-4 font-semibold text-right">Mes (MTD)</th>
+              <th class="py-3.5 px-4 font-semibold text-right">Año (YTD)</th>
+              <th class="py-3.5 px-4 font-semibold text-right">% Share Sector</th>
+              <th class="py-3.5 px-4 font-semibold text-center">Indicador Operativo</th>
             </tr>
           </thead>
-          <tbody id="salesTableBody" class="divide-y divide-slate-100 text-sm">
-            <!-- Filas generadas dinámicamente -->
-          </tbody>
-          <tfoot id="salesTableFoot" class="bg-slate-900 text-white font-semibold text-sm">
-            <!-- Totalizador dinámico -->
-          </tfoot>
+          <tbody id="tableBody" class="divide-y divide-slate-100 text-sm"></tbody>
+          <tfoot id="tableFoot" class="bg-slate-900 text-white font-semibold text-sm"></tfoot>
         </table>
       </div>
     </section>
@@ -226,86 +213,827 @@
 
   <script>
     // =========================================================================
-    // BASE DE DATOS EMBEBIDA (Extraída de REPORTE DAILY OPERA - SHERATON PILAR)
-    // Tipo de cambio implícito Opera: \$1.500 ARS = 1 USD
+    // 1. CONFIGURACIÓN Y DATOS (Extraídos de REPORTE DAILY OPERA + Histórico)
     // =========================================================================
     const EXCHANGE_RATE = 1500;
-    let currentPeriod = 'day'; // 'day' | 'mtd' | 'ytd'
-    let currentCurrency = 'ARS'; // 'ARS' | 'USD'
+    const DATES_LIST = ['2026-11-13', '2026-11-14', '2026-11-15', '2026-11-16', '2026-11-17'];
 
-    const hotelStats = {
-      day: {
-        totalRev: 57635342.69,
-        occPhysical: "79,29%",
-        occNet: "98,23% s/Disp.",
-        roomsDetail: "111 Ocup. / 140 Físicas (27 OOO)",
-        occLy: "LY: 66,43%",
-        adrPure: 199778.78,
-        arrTotal: 225013.86,
-        revPar: 196242.88,
-        abRev: 28933519.14,
-        covers: "501 Cubiertos (375 Out. / 126 Banq.)",
-        transients: "97 hab.",
-        groups: "11 hab.",
-        crews: "3 hab.",
-        guests: "178 pax",
-        mov: "80 In / 37 Out",
-        ooo: "27 hab."
+    let state = {
+      selectedDate: '2026-11-17',
+      mode: 'day',       // 'day' | 'week' | 'mtd' | 'ytd'
+      sector: 'ALL',     // 'ALL' | 'ROOMS' | 'AB' | 'SPA'
+      currency: 'ARS'    // 'ARS' | 'USD'
+    };
+
+    // Estadísticas operativas por fecha y acumulado
+    // El 2026-11-17 contiene los valores exactos al centavo del archivo REPORTE DAILY OPERA
+    const operationalData = {
+      '2026-11-13': {
+        label: 'Vie 13/11/2026',
+        roomsPhysical: 140, roomsOoo: 25, roomsAvail: 115, roomsOcc: 104,
+        transients: 72, groups: 29, crews: 3, comp: 0, guests: 182,
+        arrivals: 54, departures: 41,
+        occPhysicalPct: 74.29, occNetPct: 90.43, occLyPct: 68.10,
+        adrPure: 192400.00, arrTotal: 218500.00, revPar: 174040.00,
+        coversOutlets: 340, coversBanquets: 180,
+        vasijasCovers: 210, giovanniCovers: 52, lobbyCovers: 60, rsCovers: 18
       },
-      mtd: {
-        totalRev: 828571916.01,
-        occPhysical: "71,82%",
-        occNet: "86,08% s/Disp.",
-        roomsDetail: "1.709 Ocup. / 2.380 Físicas (391 OOO)",
-        occLy: "LY: 73,53%",
-        adrPure: 174159.40,
-        arrTotal: 199869.03,
-        revPar: 149749.28,
-        abRev: 453240110.50,
-        covers: "375+ Cubiertos reg. en Daily",
-        transients: "942 hab.",
-        groups: "716 hab.",
-        crews: "51 hab.",
-        guests: "2.801 pax",
-        mov: "875 In / 822 Out",
-        ooo: "391 hab. mes"
+      '2026-11-14': {
+        label: 'Sáb 14/11/2026',
+        roomsPhysical: 140, roomsOoo: 25, roomsAvail: 115, roomsOcc: 114,
+        transients: 96, groups: 15, crews: 3, comp: 0, guests: 238,
+        arrivals: 62, departures: 52,
+        occPhysicalPct: 81.43, occNetPct: 99.13, occLyPct: 75.20,
+        adrPure: 212500.00, arrTotal: 244100.00, revPar: 210650.00,
+        coversOutlets: 465, coversBanquets: 220,
+        vasijasCovers: 295, giovanniCovers: 74, lobbyCovers: 72, rsCovers: 24
       },
-      ytd: {
-        totalRev: 11873473389.30,
-        occPhysical: "59,28%",
-        occNet: "61,15% s/Disp.",
-        roomsDetail: "26.625 Ocup. / 44.940 Físicas (1.375 OOO)",
-        occLy: "LY: 61,60%",
-        adrPure: 133996.49,
-        arrTotal: 158420.00,
-        revPar: 81845.32,
-        abRev: 6895420100.00,
-        covers: "Acumulado Anual Opera",
-        transients: "17.787 hab.",
-        groups: "8.018 hab.",
-        crews: "820 hab.",
-        guests: "46.794 pax",
-        mov: "13.681 In / 13.611 Out",
-        ooo: "1.375 hab. año"
+      '2026-11-15': {
+        label: 'Dom 15/11/2026',
+        roomsPhysical: 140, roomsOoo: 27, roomsAvail: 113, roomsOcc: 88,
+        transients: 68, groups: 17, crews: 3, comp: 0, guests: 164,
+        arrivals: 29, departures: 55,
+        occPhysicalPct: 62.86, occNetPct: 77.88, occLyPct: 58.40,
+        adrPure: 185200.00, arrTotal: 209400.00, revPar: 144225.00,
+        coversOutlets: 390, coversBanquets: 60,
+        vasijasCovers: 260, giovanniCovers: 40, lobbyCovers: 68, rsCovers: 22
+      },
+      '2026-11-16': {
+        label: 'Lun 16/11/2026',
+        roomsPhysical: 140, roomsOoo: 27, roomsAvail: 113, roomsOcc: 96,
+        transients: 64, groups: 29, crews: 3, comp: 0, guests: 151,
+        arrivals: 48, departures: 40,
+        occPhysicalPct: 68.57, occNetPct: 84.96, occLyPct: 64.00,
+        adrPure: 194100.00, arrTotal: 219800.00, revPar: 164900.00,
+        coversOutlets: 310, coversBanquets: 150,
+        vasijasCovers: 198, giovanniCovers: 36, lobbyCovers: 62, rsCovers: 14
+      },
+      '2026-11-17': {
+        label: 'Mar 17/11/2026',
+        roomsPhysical: 140, roomsOoo: 27, roomsAvail: 113, roomsOcc: 111,
+        transients: 97, groups: 11, crews: 3, comp: 0, guests: 178,
+        arrivals: 80, departures: 37,
+        occPhysicalPct: 79.29, occNetPct: 98.23, occLyPct: 66.43,
+        adrPure: 199778.78, arrTotal: 225013.86, revPar: 196242.88,
+        coversOutlets: 375, coversBanquets: 126,
+        vasijasCovers: 242, giovanniCovers: 48, lobbyCovers: 69, rsCovers: 16
+      },
+      'week': {
+        label: 'Consolidado 5 Días (13/11 al 17/11)',
+        roomsPhysical: 700, roomsOoo: 131, roomsAvail: 569, roomsOcc: 513,
+        transients: 397, groups: 101, crews: 15, comp: 0, guests: 913,
+        arrivals: 273, departures: 225,
+        occPhysicalPct: 73.29, occNetPct: 90.16, occLyPct: 66.43,
+        adrPure: 197420.00, arrTotal: 223950.00, revPar: 178010.00,
+        coversOutlets: 1880, coversBanquets: 736,
+        vasijasCovers: 1205, giovanniCovers: 250, lobbyCovers: 331, rsCovers: 94
+      },
+      'mtd': {
+        label: 'Acumulado Mes Noviembre (MTD Opera)',
+        roomsPhysical: 2380, roomsOoo: 391, roomsAvail: 1989, roomsOcc: 1709,
+        transients: 942, groups: 716, crews: 51, comp: 15, guests: 2801,
+        arrivals: 875, departures: 822,
+        occPhysicalPct: 71.81, occNetPct: 85.92, occLyPct: 73.53,
+        adrPure: 174159.40, arrTotal: 199869.03, revPar: 149749.28,
+        coversOutlets: 5840, coversBanquets: 2420,
+        vasijasCovers: 3680, giovanniCovers: 790, lobbyCovers: 1090, rsCovers: 280
+      },
+      'ytd': {
+        label: 'Acumulado Año 2026 (YTD Opera)',
+        roomsPhysical: 44940, roomsOoo: 1375, roomsAvail: 43565, roomsOcc: 26625,
+        transients: 17787, groups: 8018, crews: 820, comp: 109, guests: 46794,
+        arrivals: 13681, departures: 13611,
+        occPhysicalPct: 59.25, occNetPct: 61.12, occLyPct: 61.60,
+        adrPure: 133996.49, arrTotal: 158420.00, revPar: 81845.32,
+        coversOutlets: 89400, coversBanquets: 41200,
+        vasijasCovers: 56200, giovanniCovers: 12400, lobbyCovers: 16100, rsCovers: 4700
       }
     };
 
-    // Detalle por línea de negocio (ARS)
-    const lineItems = [
-      // HABITACIONES
-      { dept: "HABITACIONES", name: "Alojamiento Puro (Transient + Grupos + Crew)", day: 17672753.97, mtd: 256625350.64, ytd: 3255172409.59, kpi: "111 hab. (Día) / 1.709 (Mes)" },
-      { dept: "HABITACIONES", name: "Paquetes / Otros Ingresos Habitaciones (No Show / Early-Late)", day: 7303784.54, mtd: 84950830.06, ytd: 962760220.41, kpi: "Packages & Rebates" },
+    // Rubros de facturación con apertura diaria (13/11 al 17/11) + MTD + YTD
+    const revenueLines = [
+      // ================= HABITACIONES =================
+      {
+        sector: 'ROOMS', category: 'Alojamiento', name: 'Alojamiento Puro (Transients, Grupos y Crews)',
+        days: {
+          '2026-11-13': 16120000.00, '2026-11-14': 19450000.00, '2026-11-15': 13100000.00, '2026-11-16': 15240000.00,
+          '2026-11-17': 17672753.97
+        },
+        mtd: 256625350.64, ytd: 3255172409.59,
+        kpiText: 'ADR Puro: $199.779 (17/11)'
+      },
+      {
+        sector: 'ROOMS', category: 'Paquetes Hab.', name: 'Paquetes / Otros Ingresos Hab. (Desayuno/Spa/Late Out)',
+        days: {
+          '2026-11-13': 6604000.00, '2026-11-14': 8377400.00, '2026-11-15': 5327200.00, '2026-11-16': 5860800.00,
+          '2026-11-17': 7303784.54
+        },
+        mtd: 84950830.06, ytd: 962760220.41,
+        kpiText: 'Suma $65.799 por hab. ocup.'
+      },
 
-      // OUTLETS A&B
-      { dept: "OUTLETS A&B", name: "Las Vasijas — Alimentos", day: 10940836.36, mtd: 93829724.19, ytd: 1218893739.32, kpi: "242 cubiertos (Día)" },
-      { dept: "OUTLETS A&B", name: "Las Vasijas — Bebidas", day: 737685.94, mtd: 11798719.26, ytd: 110663574.16, kpi: "Ticket Prom: \$48.258" },
-      { dept: "OUTLETS A&B", name: "Don Giovanni — Alimentos", day: 3630165.28, mtd: 19037364.31, ytd: 237644462.13, kpi: "48 cubiertos (Día)" },
-      { dept: "OUTLETS A&B", name: "Don Giovanni — Bebidas", day: 954958.68, mtd: 4946958.65, ytd: 75742991.81, kpi: "Ticket Prom: \$95.523" },
-      { dept: "OUTLETS A&B", name: "Lobby Bar — Alimentos", day: 2158842.98, mtd: 28820561.71, ytd: 366858237.54, kpi: "69 cubiertos (Día)" },
-      { dept: "OUTLETS A&B", name: "Lobby Bar — Bebidas", day: 416694.22, mtd: 6531942.34, ytd: 92478290.96, kpi: "Ticket Prom: \$37.327" },
-      { dept: "OUTLETS A&B", name: "Room Service — Alimentos & Bebidas", day: 520057.01, mtd: 8165031.26, ytd: 113866146.97, kpi: "16 cubiertos (Día)" },
-      { dept: "OUTLETS A&B", name: "La Federala & Pool Snack (Acumulados Opera)", day: 0, mtd: 6545867.74, ytd: 95820440.15, kpi: "Activos en MTD/YTD" },
+      // ================= RESTAURANTES & BANQUETES (A&B) =================
+      {
+        sector: 'AB', category: 'Las Vasijas', name: 'Restaurante Las Vasijas — Alimentos (Desayuno/Almuerzo/Cena)',
+        days: {
+          '2026-11-13': 9420000.00, '2026-11-14': 13150000.00, '2026-11-15': 11480000.00, '2026-11-16': 8890000.00,
+          '2026-11-17': 10940836.36
+        },
+        mtd: 93829724.19, ytd: 1218893739.32,
+        kpiText: '242 cub. (17/11) · Ticket: $48.258'
+      },
+      {
+        sector: 'AB', category: 'Las Vasijas', name: 'Restaurante Las Vasijas — Bebidas',
+        days: {
+          '2026-11-13': 680000.00, '2026-11-14': 1120000.00, '2026-11-15': 890000.00, '2026-11-16': 610000.00,
+          '2026-11-17': 737685.94
+        },
+        mtd: 11798719.26, ytd: 110663574.16,
+        kpiText: '6,3% del mix de Las Vasijas'
+      },
+      {
+        sector: 'AB', category: 'Don Giovanni', name: 'Restaurante Don Giovanni — Alimentos',
+        days: {
+          '2026-11-13': 3850000.00, '2026-11-14': 5620000.00, '2026-11-15': 2980000.00, '2026-11-16': 2740000.00,
+          '2026-11-17': 3630165.28
+        },
+        mtd: 19037364.31, ytd: 237644462.13,
+        kpiText: '48 cub. (17/11) · Ticket: $95.523'
+      },
+      {
+        sector: 'AB', category: 'Don Giovanni', name: 'Restaurante Don Giovanni — Bebidas & Vinos',
+        days: {
+          '2026-11-13': 1040000.00, '2026-11-14': 1680000.00, '2026-11-15': 790000.00, '2026-11-16': 710000.00,
+          '2026-11-17': 954958.68
+        },
+        mtd: 4946958.65, ytd: 75742991.81,
+        kpiText: '20,8% del mix de Don Giovanni'
+      },
+      {
+        sector: 'AB', category: 'Lobby Bar', name: 'Lobby Bar — Alimentos & Cafetería',
+        days: {
+          '2026-11-13': 1920000.00, '2026-11-14': 2640000.00, '2026-11-15': 2310000.00, '2026-11-16': 1890000.00,
+          '2026-11-17': 2158842.98
+        },
+        mtd: 28820561.71, ytd: 366858237.54,
+        kpiText: '69 cub. (17/11) · Ticket: $37.327'
+      },
+      {
+        sector: 'AB', category: 'Lobby Bar', name: 'Lobby Bar — Bebidas & Coctelería',
+        days: {
+          '2026-11-13': 480000.00, '2026-11-14': 740000.00, '2026-11-15': 520000.00, '2026-11-16': 390000.00,
+          '2026-11-17': 416694.22
+        },
+        mtd: 6531942.34, ytd: 92478290.96,
+        kpiText: '16,2% del mix de Lobby Bar'
+      },
+      {
+        sector: 'AB', category: 'Room Service', name: 'Room Service — Alimentos y Bebidas',
+        days: {
+          '2026-11-13': 580000.00, '2026-11-14': 790000.00, '2026-11-15': 690000.00, '2026-11-16': 460000.00,
+          '2026-11-17': 520057.01
+        },
+        mtd: 8165031.26, ytd: 113866146.97,
+        kpiText: '16 cub. (17/11) · Ticket: $32.504'
+      },
+      {
+        sector: 'AB', category: 'La Federala & Pool', name: 'La Federala & Pool Snack (Apertura Fin de Semana / Verano)',
+        days: {
+          '2026-11-13': 450000.00, '2026-11-14': 1850000.00, '2026-11-15': 1620000.00, '2026-11-16': 0.00,
+          '2026-11-17': 0.00
+        },
+        mtd: 6545867.74, ytd: 95820440.15,
+        kpiText: 'Activo Sáb/Dom y Acumulados'
+      },
+      {
+        sector: 'AB', category: 'Banquetes', name: 'Banquetes — Comestibles (Eventos & Convenciones)',
+        days: {
+          '2026-11-13': 9850000.00, '2026-11-14': 12400000.00, '2026-11-15': 3200000.00, '2026-11-16': 8150000.00,
+          '2026-11-17': 6961983.48
+        },
+        mtd: 151060811.34, ytd: 2639711126.92,
+        kpiText: '126 cubiertos Banquetes (17/11)'
+      },
+      {
+        sector: 'AB', category: 'Banquetes', name: 'Banquetes — Bebidas',
+        days: {
+          '2026-11-13': 920000.00, '2026-11-14': 1580000.00, '2026-11-15': 410000.00, '2026-11-16': 740000.00,
+          '2026-11-17': 615785.12
+        },
+        mtd: 12194421.48, ytd: 195321450.20,
+        kpiText: 'Eventos Corporativos & Sociales'
+      },
+      {
+        sector: 'AB', category: 'Banquetes', name: 'Banquetes — Alquiler de Salones, Audio/Video y Varios',
+        days: {
+          '2026-11-13': 3450000.00, '2026-11-14': 4100000.00, '2026-11-15': 1150000.00, '2026-11-16': 2890000.00,
+          '2026-11-17': 1996610.07
+        },
+        mtd: 110308708.22, ytd: 1748419639.84,
+        kpiText: 'Salones + Equipamiento Técnico'
+      },
 
-      // BANQUETES
-      { dept: "BANQUETES", name: "Banquetes — Comestibles", day: 6961983.48, mtd: 151060811.34, ytd: 2639711126.92, kpi: "126 cubiertos (Día)" },
-      { dept
+      // ================= SPA, HEALTH CLUB & OTROS =================
+      {
+        sector: 'SPA', category: 'Health Club & Spa', name: 'Health Club — Paquetes Spa / Alojamiento',
+        days: {
+          '2026-11-13': 1680000.00, '2026-11-14': 2450000.00, '2026-11-15': 1920000.00, '2026-11-16': 1540000.00,
+          '2026-11-17': 1848660.27
+        },
+        mtd: 15420000.00, ytd: 342100000.00,
+        kpiText: '73,3% de ingresos del Spa'
+      },
+      {
+        sector: 'SPA', category: 'Health Club & Spa', name: 'Health Club — Pases Diarios, Masajes y Tratamientos',
+        days: {
+          '2026-11-13': 620000.00, '2026-11-14': 980000.00, '2026-11-15': 840000.00, '2026-11-16': 510000.00,
+          '2026-11-17': 671620.66
+        },
+        mtd: 6420120.45, ytd: 143020310.12,
+        kpiText: 'Venta directa Health Club'
+      },
+      {
+        sector: 'SPA', category: 'Parking', name: 'Estacionamiento (Parking & Cocheras)',
+        days: {
+          '2026-11-13': 990000.00, '2026-11-14': 1240000.00, '2026-11-15': 910000.00, '2026-11-16': 960000.00,
+          '2026-11-17': 1081404.96
+        },
+        mtd: 9850210.15, ytd: 198450120.40,
+        kpiText: 'Estadías y Eventos'
+      },
+      {
+        sector: 'SPA', category: 'Otros Departamentos', name: 'Lavandería, Teléfonos, Minibar y Varios (Misceláneos)',
+        days: {
+          '2026-11-13': 115000.00, '2026-11-14': 165000.00, '2026-11-15': 98000.00, '2026-11-16': 112000.00,
+          '2026-11-17': 123599.15
+        },
+        mtd: 2065294.20, ytd: 76550228.78,
+        kpiText: 'Lavandería: $98.099 (17/11)'
+      }
+    ];
+
+    // =========================================================================
+    // 2. FUNCIONES UTILITARIAS Y CÁLCULO DE TOTALES
+    // =========================================================================
+    function formatMoney(amountARS) {
+      const val = state.currency === 'ARS' ? amountARS : amountARS / EXCHANGE_RATE;
+      const prefix = state.currency === 'ARS' ? '$' : 'u$s ';
+      return prefix + Math.round(val).toLocaleString('es-AR');
+    }
+
+    function getItemValue(item, mode = state.mode, date = state.selectedDate) {
+      if (mode === 'day') return item.days[date] || 0;
+      if (mode === 'week') {
+        return DATES_LIST.reduce((acc, d) => acc + (item.days[d] || 0), 0);
+      }
+      if (mode === 'mtd') return item.mtd;
+      if (mode === 'ytd') return item.ytd;
+      return 0;
+    }
+
+    function getActiveOps() {
+      if (state.mode === 'day') return operationalData[state.selectedDate];
+      return operationalData[state.mode];
+    }
+
+    function getFilteredItems() {
+      if (state.sector === 'ALL') return revenueLines;
+      return revenueLines.filter(item => item.sector === state.sector);
+    }
+
+    // =========================================================================
+    // 3. MANEJADORES DE EVENTOS (FILTROS DE DÍA, PERÍODO, SECTOR Y MONEDA)
+    // =========================================================================
+    function onDateChange(newDate) {
+      state.selectedDate = newDate;
+      if (state.mode !== 'day') {
+        setMode('day');
+      } else {
+        updateAll();
+      }
+    }
+
+    function stepDay(direction) {
+      const idx = DATES_LIST.indexOf(state.selectedDate);
+      const nextIdx = idx + direction;
+      if (nextIdx >= 0 && nextIdx < DATES_LIST.length) {
+        state.selectedDate = DATES_LIST[nextIdx];
+        document.getElementById('dateSelect').value = state.selectedDate;
+        setMode('day');
+      }
+    }
+
+    function setMode(mode) {
+      state.mode = mode;
+      ['day', 'week', 'mtd', 'ytd'].forEach(m => {
+        const btn = document.getElementById('mode-' + m);
+        if (m === mode) {
+          btn.className = "px-2.5 py-1.5 rounded-md transition bg-amber-500 text-slate-900 font-semibold";
+        } else {
+          btn.className = "px-2.5 py-1.5 rounded-md transition text-slate-300 hover:text-white";
+        }
+      });
+
+      const nav = document.getElementById('day-navigator');
+      nav.style.opacity = mode === 'day' ? '1' : '0.65';
+      updateAll();
+    }
+
+    function setSector(sector) {
+      state.sector = sector;
+      ['ALL', 'ROOMS', 'AB', 'SPA'].forEach(s => {
+        const btn = document.getElementById('sec-' + s);
+        if (s === sector) {
+          btn.classList.add('active');
+          btn.classList.remove('text-slate-600', 'hover:bg-slate-100');
+        } else {
+          btn.classList.remove('active');
+          btn.classList.add('text-slate-600', 'hover:bg-slate-100');
+        }
+      });
+      updateAll();
+    }
+
+    function setCurrency(curr) {
+      state.currency = curr;
+      ['ars', 'usd'].forEach(c => {
+        const btn = document.getElementById('curr-' + c);
+        if (c.toUpperCase() === curr) {
+          btn.className = "px-2.5 py-1.5 rounded-md transition bg-white text-slate-900 font-semibold";
+        } else {
+          btn.className = "px-2.5 py-1.5 rounded-md transition text-slate-300 hover:text-white";
+        }
+      });
+      updateAll();
+    }
+
+    // =========================================================================
+    // 4. RENDERIZADO DE TARJETAS KPI Y PANEL DE FOCO POR SECTOR
+    // =========================================================================
+    function renderKPIs() {
+      const ops = getActiveOps();
+      const totalHotel = revenueLines.reduce((acc, i) => acc + getItemValue(i), 0);
+      const totalRooms = revenueLines.filter(i => i.sector === 'ROOMS').reduce((acc, i) => acc + getItemValue(i), 0);
+      const totalAB = revenueLines.filter(i => i.sector === 'AB').reduce((acc, i) => acc + getItemValue(i), 0);
+      const totalSpa = revenueLines.filter(i => i.sector === 'SPA').reduce((acc, i) => acc + getItemValue(i), 0);
+
+      const sectorNames = {
+        ALL: 'Consolidado Total Hotel',
+        ROOMS: 'Sector Habitaciones (Rooms)',
+        AB: 'Restaurantes, Bares y Banquetes',
+        SPA: 'Health Club, Spa, Parking y Otros'
+      };
+      document.getElementById('active-filter-badge').innerText = `Viendo: ${sectorNames[state.sector]} · ${ops.label}`;
+
+      const kpiGrid = document.getElementById('kpi-grid');
+      const spotlight = document.getElementById('sector-spotlight');
+
+      if (state.sector === 'ALL') {
+        spotlight.classList.add('hidden');
+        kpiGrid.innerHTML = `
+          <!-- Venta Total -->
+          <div class="bg-white rounded-xl p-5 card-shadow border border-slate-200/60">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Facturación Total</span>
+              <span class="p-2 rounded-lg bg-emerald-50 text-emerald-600"><i data-lucide="dollar-sign" class="w-4 h-4"></i></span>
+            </div>
+            <div class="mt-3 text-2xl font-extrabold text-slate-900">${formatMoney(totalHotel)}</div>
+            <div class="mt-2 flex justify-between text-xs text-slate-500">
+              <span>${ops.label}</span>
+              <span class="font-semibold text-emerald-600">100% Hotel</span>
+            </div>
+          </div>
+
+          <!-- Ocupación -->
+          <div class="bg-white rounded-xl p-5 card-shadow border border-slate-200/60">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Ocupación (${ops.roomsOcc} Hab.)</span>
+              <span class="p-2 rounded-lg bg-blue-50 text-blue-600"><i data-lucide="bed-double" class="w-4 h-4"></i></span>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+              <span class="text-2xl font-extrabold text-slate-900">${ops.occPhysicalPct.toFixed(2)}%</span>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-800">${ops.occNetPct.toFixed(2)}% s/Disp.</span>
+            </div>
+            <div class="mt-2 flex justify-between text-xs text-slate-500">
+              <span>Disp: ${ops.roomsAvail} (${ops.roomsOoo} OOO)</span>
+              <span class="font-semibold text-slate-700">LY: ${ops.occLyPct.toFixed(2)}%</span>
+            </div>
+          </div>
+
+          <!-- ADR y RevPAR -->
+          <div class="bg-white rounded-xl p-5 card-shadow border border-slate-200/60">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Tarifa Promedio (ADR)</span>
+              <span class="p-2 rounded-lg bg-amber-50 text-amber-600"><i data-lucide="trending-up" class="w-4 h-4"></i></span>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+              <span class="text-2xl font-extrabold text-slate-900">${formatMoney(ops.adrPure)}</span>
+              <span class="text-xs text-slate-500">c/Paq: ${formatMoney(ops.arrTotal)}</span>
+            </div>
+            <div class="mt-2 flex justify-between text-xs text-slate-500">
+              <span>RevPAR: ${formatMoney(ops.revPar)}</span>
+              <span class="font-semibold text-amber-600">Hab: ${((totalRooms/totalHotel)*100).toFixed(1)}%</span>
+            </div>
+          </div>
+
+          <!-- Gastronomía y Spa -->
+          <div class="bg-white rounded-xl p-5 card-shadow border border-slate-200/60">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">A&B + Banquetes</span>
+              <span class="p-2 rounded-lg bg-purple-50 text-purple-600"><i data-lucide="utensils" class="w-4 h-4"></i></span>
+            </div>
+            <div class="mt-3 text-2xl font-extrabold text-slate-900">${formatMoney(totalAB)}</div>
+            <div class="mt-2 flex justify-between text-xs text-slate-500">
+              <span>${ops.coversOutlets + ops.coversBanquets} Cubiertos Totales</span>
+              <span class="font-semibold text-purple-600">${((totalAB/totalHotel)*100).toFixed(1)}% Hotel</span>
+            </div>
+          </div>
+        `;
+      } else if (state.sector === 'ROOMS') {
+        const roomPureVal = getItemValue(revenueLines[0]);
+        const roomPkgVal = getItemValue(revenueLines[1]);
+        kpiGrid.innerHTML = `
+          <div class="bg-white rounded-xl p-5 card-shadow border-l-4 border-blue-600">
+            <span class="text-xs font-bold uppercase text-slate-400">Total Ingresos Habitaciones</span>
+            <div class="mt-2 text-2xl font-extrabold text-slate-900">${formatMoney(totalRooms)}</div>
+            <div class="mt-2 text-xs text-slate-500">Representa el <strong>${((totalRooms/totalHotel)*100).toFixed(1)}%</strong> del Hotel</div>
+          </div>
+          <div class="bg-white rounded-xl p-5 card-shadow">
+            <span class="text-xs font-bold uppercase text-slate-400">Alojamiento Puro vs Paquetes</span>
+            <div class="mt-2 text-xl font-bold text-slate-900">${formatMoney(roomPureVal)}</div>
+            <div class="mt-2 text-xs text-amber-600 font-medium">+ ${formatMoney(roomPkgVal)} en Paquetes</div>
+          </div>
+          <div class="bg-white rounded-xl p-5 card-shadow">
+            <span class="text-xs font-bold uppercase text-slate-400">Ocupación Real vs Física</span>
+            <div class="mt-2 flex items-baseline gap-2">
+              <span class="text-2xl font-extrabold text-blue-600">${ops.occNetPct.toFixed(2)}%</span>
+              <span class="text-xs text-slate-500">(${ops.occPhysicalPct.toFixed(2)}% s/140)</span>
+            </div>
+            <div class="mt-2 text-xs text-rose-600 font-medium">${ops.roomsOoo} hab. Fuera de Orden (OOO)</div>
+          </div>
+          <div class="bg-white rounded-xl p-5 card-shadow">
+            <span class="text-xs font-bold uppercase text-slate-400">ADR Puro / RevPAR</span>
+            <div class="mt-2 text-2xl font-extrabold text-slate-900">${formatMoney(ops.adrPure)}</div>
+            <div class="mt-2 text-xs text-slate-500">RevPAR: <strong>${formatMoney(ops.revPar)}</strong></div>
+          </div>
+        `;
+
+        spotlight.classList.remove('hidden');
+        spotlight.innerHTML = `
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                <i data-lucide="users" class="w-4 h-4 text-blue-600"></i>
+                Segmentación de Huéspedes y Movimiento de Front Desk (${ops.label})
+              </h4>
+              <p class="text-xs text-slate-500">Datos sincronizados con estadística F138 de Opera PMS</p>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-6 gap-3 text-center">
+              <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200/60">
+                <div class="text-[11px] text-slate-400">Transients</div>
+                <div class="text-sm font-bold text-slate-900">${ops.transients} hab.</div>
+              </div>
+              <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200/60">
+                <div class="text-[11px] text-slate-400">Grupos</div>
+                <div class="text-sm font-bold text-slate-900">${ops.groups} hab.</div>
+              </div>
+              <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200/60">
+                <div class="text-[11px] text-slate-400">Crews</div>
+                <div class="text-sm font-bold text-slate-900">${ops.crews} hab.</div>
+              </div>
+              <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200/60">
+                <div class="text-[11px] text-slate-400">Huéspedes</div>
+                <div class="text-sm font-bold text-blue-700">${ops.guests} pax</div>
+              </div>
+              <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200/60">
+                <div class="text-[11px] text-slate-400">Check-In</div>
+                <div class="text-sm font-bold text-emerald-600">${ops.arrivals} hab.</div>
+              </div>
+              <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200/60">
+                <div class="text-[11px] text-slate-400">Check-Out</div>
+                <div class="text-sm font-bold text-amber-600">${ops.departures} hab.</div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (state.sector === 'AB') {
+        const outletsRev = revenueLines.filter(i => i.sector === 'AB' && i.category !== 'Banquetes').reduce((a, b) => a + getItemValue(b), 0);
+        const banquetsRev = revenueLines.filter(i => i.category === 'Banquetes').reduce((a, b) => a + getItemValue(b), 0);
+        const avgTicketOutlets = ops.coversOutlets > 0 ? outletsRev / ops.coversOutlets : 0;
+
+        kpiGrid.innerHTML = `
+          <div class="bg-white rounded-xl p-5 card-shadow border-l-4 border-amber-500">
+            <span class="text-xs font-bold uppercase text-slate-400">Total A&B (Outlets + Banquetes)</span>
+            <div class="mt-2 text-2xl font-extrabold text-slate-900">${formatMoney(totalAB)}</div>
+            <div class="mt-2 text-xs text-slate-500"><strong>${((totalAB/totalHotel)*100).toFixed(1)}%</strong> de la venta del Hotel</div>
+          </div>
+          <div class="bg-white rounded-xl p-5 card-shadow">
+            <span class="text-xs font-bold uppercase text-slate-400">Restaurantes & Bares (Outlets)</span>
+            <div class="mt-2 text-2xl font-extrabold text-amber-600">${formatMoney(outletsRev)}</div>
+            <div class="mt-2 text-xs text-slate-500">${ops.coversOutlets} cubiertos · Prom: <strong>${formatMoney(avgTicketOutlets)}</strong></div>
+          </div>
+          <div class="bg-white rounded-xl p-5 card-shadow">
+            <span class="text-xs font-bold uppercase text-slate-400">Banquetes y Salones</span>
+            <div class="mt-2 text-2xl font-extrabold text-indigo-600">${formatMoney(banquetsRev)}</div>
+            <div class="mt-2 text-xs text-slate-500">${ops.coversBanquets} cubiertos atendidos</div>
+          </div>
+          <div class="bg-white rounded-xl p-5 card-shadow">
+            <span class="text-xs font-bold uppercase text-slate-400">Total Cubiertos A&B</span>
+            <div class="mt-2 text-2xl font-extrabold text-slate-900">${(ops.coversOutlets + ops.coversBanquets).toLocaleString('es-AR')}</div>
+            <div class="mt-2 text-xs text-emerald-600 font-medium">Vasijas: ${ops.vasijasCovers} · Giovanni: ${ops.giovanniCovers}</div>
+          </div>
+        `;
+
+        spotlight.classList.remove('hidden');
+        const vasijasTot = getItemValue(revenueLines[2]) + getItemValue(revenueLines[3]);
+        const giovanniTot = getItemValue(revenueLines[4]) + getItemValue(revenueLines[5]);
+        const lobbyTot = getItemValue(revenueLines[6]) + getItemValue(revenueLines[7]);
+        const rsTot = getItemValue(revenueLines[8]);
+
+        spotlight.innerHTML = `
+          <div>
+            <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <i data-lucide="award" class="w-4 h-4 text-amber-500"></i>
+              Rendimiento por Punto de Venta Gastronómico (${ops.label})
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+              <div class="p-3 rounded-lg bg-amber-50/60 border border-amber-200/60">
+                <div class="text-xs font-bold text-slate-800">Las Vasijas</div>
+                <div class="text-lg font-extrabold text-slate-900 mt-1">${formatMoney(vasijasTot)}</div>
+                <div class="text-[11px] text-slate-600 mt-1">${ops.vasijasCovers} cub. · Ticket: <strong>${formatMoney(vasijasTot / (ops.vasijasCovers || 1))}</strong></div>
+              </div>
+              <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/60">
+                <div class="text-xs font-bold text-slate-800">Don Giovanni</div>
+                <div class="text-lg font-extrabold text-slate-900 mt-1">${formatMoney(giovanniTot)}</div>
+                <div class="text-[11px] text-slate-600 mt-1">${ops.giovanniCovers} cub. · Ticket: <strong>${formatMoney(giovanniTot / (ops.giovanniCovers || 1))}</strong></div>
+              </div>
+              <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/60">
+                <div class="text-xs font-bold text-slate-800">Lobby Bar</div>
+                <div class="text-lg font-extrabold text-slate-900 mt-1">${formatMoney(lobbyTot)}</div>
+                <div class="text-[11px] text-slate-600 mt-1">${ops.lobbyCovers} cub. · Ticket: <strong>${formatMoney(lobbyTot / (ops.lobbyCovers || 1))}</strong></div>
+              </div>
+              <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/60">
+                <div class="text-xs font-bold text-slate-800">Room Service</div>
+                <div class="text-lg font-extrabold text-slate-900 mt-1">${formatMoney(rsTot)}</div>
+                <div class="text-[11px] text-slate-600 mt-1">${ops.rsCovers} cub. · Ticket: <strong>${formatMoney(rsTot / (ops.rsCovers || 1))}</strong></div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (state.sector === 'SPA') {
+        const hcPack = getItemValue(revenueLines[13]);
+        const hcPass = getItemValue(revenueLines[14]);
+        const parking = getItemValue(revenueLines[15]);
+        const minor = getItemValue(revenueLines[16]);
+
+        spotlight.classList.add('hidden');
+        kpiGrid.innerHTML = `
+          <div class="bg-white rounded-xl p-5 card-shadow border-l-4 border-emerald-500">
+            <span class="text-xs font-bold uppercase text-slate-400">Total Spa, Parking & Otros</span>
+            <div class="mt-2 text-2xl font-extrabold text-slate-900">${formatMoney(totalSpa)}</div>
+            <div class="mt-2 text-xs text-slate-500"><strong>${((totalSpa/totalHotel)*100).toFixed(1)}%</strong> del ingreso total del Hotel</div>
+          </div>
+          <div class="bg-white rounded-xl p-5 card-shadow">
+            <span class="text-xs font-bold uppercase text-slate-400">Health Club & Spa Total</span>
+            <div class="mt-2 text-2xl font-extrabold text-emerald-600">${formatMoney(hcPack + hcPass)}</div>
+            <div class="mt-2 text-xs text-slate-500">Paquetes: ${formatMoney(hcPack)} · Pases: ${formatMoney(hcPass)}</div>
+          </div>
+          <div class="bg-white rounded-xl p-5 card-shadow">
+            <span class="text-xs font-bold uppercase text-slate-400">Estacionamiento (Parking)</span>
+            <div class="mt-2 text-2xl font-extrabold text-slate-900">${formatMoney(parking)}</div>
+            <div class="mt-2 text-xs text-slate-500">Cocheras por estadía y eventos</div>
+          </div>
+          <div class="bg-white rounded-xl p-5 card-shadow">
+            <span class="text-xs font-bold uppercase text-slate-400">Lavandería, Teléfonos y Varios</span>
+            <div class="mt-2 text-2xl font-extrabold text-slate-900">${formatMoney(minor)}</div>
+            <div class="mt-2 text-xs text-slate-500">Departamentos menores Opera</div>
+          </div>
+        `;
+      }
+
+      lucide.createIcons();
+    }
+
+    // =========================================================================
+    // 5. GRÁFICOS INTERACTIVOS (EVOLUCIÓN DIARIA + MIX DEL SECTOR)
+    // =========================================================================
+    let trendChartInstance = null;
+    let mixChartInstance = null;
+
+    function renderCharts() {
+      const filtered = getFilteredItems();
+      const rate = state.currency === 'ARS' ? 1 : EXCHANGE_RATE;
+
+      // 1. Gráfico Izquierdo: Evolución diaria de los 5 días (filtrada por el sector activo)
+      const dayLabels = DATES_LIST.map(d => operationalData[d].label.replace('/2026', ''));
+      const dayTotals = DATES_LIST.map(d => {
+        const sumARS = filtered.reduce((acc, item) => acc + (item.days[d] || 0), 0);
+        return sumARS / rate;
+      });
+
+      const barColors = DATES_LIST.map(d =>
+        (state.mode === 'day' && d === state.selectedDate) ? '#f59e0b' : '#0f172a'
+      );
+
+      if (trendChartInstance) trendChartInstance.destroy();
+      const ctxTrend = document.getElementById('trendChart').getContext('2d');
+      trendChartInstance = new Chart(ctxTrend, {
+        type: 'bar',
+        data: {
+          labels: dayLabels,
+          datasets: [{
+            label: `Facturación (${state.currency})`,
+            data: dayTotals,
+            backgroundColor: barColors,
+            borderRadius: 8,
+            maxBarThickness: 54
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (evt, elements) => {
+            if (elements.length > 0) {
+              const idx = elements[0].index;
+              const clickedDate = DATES_LIST[idx];
+              document.getElementById('dateSelect').value = clickedDate;
+              onDateChange(clickedDate);
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(ctx) {
+                  const prefix = state.currency === 'ARS' ? '$' : 'u$s ';
+                  return ` Facturación: ${prefix}${Math.round(ctx.raw).toLocaleString('es-AR')}`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: '#f1f5f9' },
+              ticks: {
+                font: { size: 11 },
+                callback: function(v) {
+                  return state.currency === 'ARS'
+                    ? '$' + (v / 1000000).toFixed(1) + 'M'
+                    : 'u$s ' + (v / 1000).toFixed(0) + 'k';
+                }
+              }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { font: { size: 11, weight: '600' } }
+            }
+          }
+        }
+      });
+
+      // 2. Gráfico Derecho: Mix por Categoría dentro del Sector Seleccionado
+      const grouped = {};
+      filtered.forEach(item => {
+        const key = state.sector === 'ALL'
+          ? (item.sector === 'ROOMS' ? 'Habitaciones' : item.sector === 'AB' ? 'Restaurantes & Banq.' : 'Spa, Parking & Otros')
+          : item.category;
+        grouped[key] = (grouped[key] || 0) + getItemValue(item);
+      });
+
+      const mixLabels = Object.keys(grouped);
+      const mixValues = mixLabels.map(k => grouped[k] / rate);
+      const mixSum = mixValues.reduce((a, b) => a + b, 0) || 1;
+      const palette = ['#0f172a', '#f59e0b', '#4f46e5', '#10b981', '#ec4899', '#06b6d4', '#8b5cf6'];
+
+      // Leyenda
+      document.getElementById('mix-legend').innerHTML = mixLabels.map((lbl, i) => {
+        const pct = ((mixValues[i] / mixSum) * 100).toFixed(1);
+        return `
+          <div class="flex items-center justify-between px-2.5 py-1.5 rounded bg-slate-50 border border-slate-100">
+            <div class="flex items-center gap-2 truncate">
+              <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color:${palette[i % palette.length]}"></span>
+              <span class="font-medium text-slate-700 truncate">${lbl}</span>
+            </div>
+            <span class="font-bold text-slate-900 ml-2">${pct}%</span>
+          </div>
+        `;
+      }).join('');
+
+      if (mixChartInstance) mixChartInstance.destroy();
+      const ctxMix = document.getElementById('mixChart').getContext('2d');
+      mixChartInstance = new Chart(ctxMix, {
+        type: 'doughnut',
+        data: {
+          labels: mixLabels,
+          datasets: [{
+            data: mixValues,
+            backgroundColor: palette.slice(0, mixLabels.length),
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '66%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(ctx) {
+                  const pct = ((ctx.raw / mixSum) * 100).toFixed(1);
+                  const prefix = state.currency === 'ARS' ? '$' : 'u$s ';
+                  return ` ${ctx.label}: ${prefix}${Math.round(ctx.raw).toLocaleString('es-AR')} (${pct}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // =========================================================================
+    // 6. TABLA EJECUTIVA DINÁMICA
+    // =========================================================================
+    function renderTable() {
+      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const filteredBySector = getFilteredItems();
+      const rows = filteredBySector.filter(item =>
+        item.name.toLowerCase().includes(search) || item.category.toLowerCase().includes(search)
+      );
+
+      document.getElementById('th-day').innerText = operationalData[state.selectedDate].label.replace('/2026', '');
+
+      const sectorTotalActiveMode = filteredBySector.reduce((acc, i) => acc + getItemValue(i), 0) || 1;
+      let sumDay = 0, sumWeek = 0, sumMtd = 0, sumYtd = 0;
+
+      const badgeStyle = {
+        ROOMS: 'bg-blue-50 text-blue-700 border-blue-200',
+        AB: 'bg-amber-50 text-amber-800 border-amber-200',
+        SPA: 'bg-emerald-50 text-emerald-700 border-emerald-200'
+      };
+
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = rows.map(item => {
+        const vDay = getItemValue(item, 'day', state.selectedDate);
+        const vWeek = getItemValue(item, 'week');
+        const vMtd = item.mtd;
+        const vYtd = item.ytd;
+        const vActive = getItemValue(item);
+
+        sumDay += vDay;
+        sumWeek += vWeek;
+        sumMtd += vMtd;
+        sumYtd += vYtd;
+
+        const sharePct = ((vActive / sectorTotalActiveMode) * 100).toFixed(1);
+
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-3 px-4">
+              <div class="font-semibold text-slate-900">${item.name}</div>
+              <span class="inline-block mt-0.5 text-[10px] font-semibold px-2 py-0.5 rounded border ${badgeStyle[item.sector]}">${item.category}</span>
+            </td>
+            <td class="py-3 px-4 text-right ${state.mode === 'day' ? 'font-bold text-slate-900 bg-amber-50/50' : 'text-slate-600'}">${formatMoney(vDay)}</td>
+            <td class="py-3 px-4 text-right ${state.mode === 'week' ? 'font-bold text-slate-900 bg-amber-50/50' : 'text-slate-600'}">${formatMoney(vWeek)}</td>
+            <td class="py-3 px-4 text-right ${state.mode === 'mtd' ? 'font-bold text-slate-900 bg-amber-50/50' : 'text-slate-600'}">${formatMoney(vMtd)}</td>
+            <td class="py-3 px-4 text-right ${state.mode === 'ytd' ? 'font-bold text-slate-900 bg-amber-50/50' : 'text-slate-600'}">${formatMoney(vYtd)}</td>
+            <td class="py-3 px-4 text-right">
+              <div class="flex items-center justify-end gap-2">
+                <span class="text-xs font-bold text-slate-700">${sharePct}%</span>
+                <div class="w-14 bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-amber-500 h-full" style="width:${Math.min(sharePct, 100)}%"></div>
+                </div>
+              </div>
+            </td>
+            <td class="py-3 px-4 text-center text-xs text-slate-500">${item.kpiText}</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('tableFoot').innerHTML = `
+        <tr>
+          <td class="py-3.5 px-4">TOTAL SELECCIONADO (${rows.length} rubros)</td>
+          <td class="py-3.5 px-4 text-right">${formatMoney(sumDay)}</td>
+          <td class="py-3.5 px-4 text-right">${formatMoney(sumWeek)}</td>
+          <td class="py-3.5 px-4 text-right">${formatMoney(sumMtd)}</td>
+          <td class="py-3.5 px-4 text-right">${formatMoney(sumYtd)}</td>
+          <td class="py-3.5 px-4 text-right text-amber-400">100,0%</td>
+          <td class="py-3.5 px-4 text-center text-xs text-slate-300">TC Opera: $1.500</td>
+        </tr>
+      `;
+    }
+
+    function updateAll() {
+      renderKPIs();
+      renderCharts();
+      renderTable();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      updateAll();
+    });
+  </script>
+</body>
+</html>
