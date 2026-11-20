@@ -20,11 +20,12 @@
       border-color: #0f172a;
       box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
     }
-    .outlet-pill.active {
-      background-color: #f59e0b;
-      color: #0f172a;
+    .service-pill.active {
+      background-color: #0f172a;
+      color: #fbbf24;
       font-weight: 700;
-      border-color: #f59e0b;
+      border-color: #0f172a;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
     }
     .tabular-nums { font-variant-numeric: tabular-nums; }
   </style>
@@ -113,7 +114,7 @@
 
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6">
 
-    <!-- 1. INDICADORES PRINCIPALES DE LA ACTIVIDAD DEL DÍA / PERÍODO (ARRIBA DE TODO) -->
+    <!-- 1. INDICADORES PRINCIPALES DE LA ACTIVIDAD DEL DÍA / PERÍODO -->
     <section class="space-y-3 tabular-nums">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <h2 class="text-sm font-bold uppercase tracking-wider text-slate-600 flex items-center gap-2">
@@ -139,7 +140,7 @@
         </button>
         <button onclick="setSector('AB')" id="sec-AB" class="sector-btn flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200/70 transition">
           <i data-lucide="utensils" class="w-4 h-4 text-amber-600"></i>
-          Restaurantes, Desayunos & Banquetes
+          Restaurantes, Turnos & Banquetes
         </button>
         <button onclick="setSector('SPA')" id="sec-SPA" class="sector-btn flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200/70 transition">
           <i data-lucide="sparkles" class="w-4 h-4 text-emerald-600"></i>
@@ -152,10 +153,10 @@
       </div>
     </section>
 
-    <!-- 3. PANEL DETALLADO DINÁMICO (DESAYUNOS, RESTAURANTES POR OUTLET, SEGMENTOS HAB.) -->
+    <!-- 3. PANEL DETALLADO DINÁMICO (MONITOR POR TURNO / OUTLET, SEGMENTOS HAB.) -->
     <section id="sector-spotlight" class="bg-white rounded-xl p-5 card-shadow border border-slate-200/70 tabular-nums"></section>
 
-    <!-- 4. GRÁFICOS LIMPIOS (SIN COMPARATIVA AÑO PASADO) -->
+    <!-- 4. GRÁFICOS LIMPIOS -->
     <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       <!-- Gráfico Izquierdo -->
       <div class="bg-white rounded-xl p-5 card-shadow border border-slate-200/60 lg:col-span-7 flex flex-col justify-between">
@@ -230,10 +231,10 @@
 
     let state = {
       selectedDate: '2026-11-17',
-      mode: 'day',          // 'day' | 'cons8' | 'mtd' | 'ytd'
-      sector: 'ALL',        // 'ALL' | 'ROOMS' | 'AB' | 'SPA'
-      outletFilter: 'ALL',  // 'ALL' | 'Las Vasijas' | 'Don Giovanni' | 'Lobby Bar' | 'Room Service' | 'Banquetes'
-      currency: 'ARS',      // 'ARS' | 'USD'
+      mode: 'day',               // 'day' | 'cons8' | 'mtd' | 'ytd'
+      sector: 'ALL',             // 'ALL' | 'ROOMS' | 'AB' | 'SPA'
+      serviceFocus: 'DESAYUNO',  // 'DESAYUNO' | 'ALMUERZO' | 'CENA_VASIJAS' | 'DON_GIOVANNI' | 'LOBBY_BAR' | 'ROOM_SERVICE' | 'BANQUETES'
+      currency: 'ARS',           // 'ARS' | 'USD'
       showDecimals: true
     };
 
@@ -263,10 +264,8 @@
     }
 
     // =========================================================================
-    // 2. DATOS OPERATIVOS DIARIOS (HABITACIONES, CUBIERTOS POR TURNO Y DESAYUNO)
+    // 2. DATOS OPERATIVOS DIARIOS (HABITACIONES, CUBIERTOS Y FACTURACIÓN POR TURNO)
     // =========================================================================
-    // Nota: Incluye desglose de cubiertos por turno y facturación específica de
-    // Desayuno (Directo en salón vs. Incluido en Paquete de Alojamiento Cód. 199)
     const dailyOps = {
       '2026-11-11': {
         label: 'Mié 11/11/2026', short: 'Mié 11/11',
@@ -277,9 +276,11 @@
           vasijasDesayuno: 58, vasijasAlmuerzo: 15, vasijasCena: 10,
           giovanniCena: 58, lobbyBar: 122, roomService: 11, banquetes: 299
         },
-        breakfastRev: {
-          directSalon: 485200.00,
-          packageIncluded: 1245000.00
+        vasijasShiftsRev: {
+          desayunoDirecto: 485200.00,
+          desayunoPaquete: 1245000.00,
+          almuerzoFood: 462000.00, almuerzoBev: 98000.00,
+          cenaFood: 310105.78, cenaBev: 68611.57
         }
       },
       '2026-11-12': {
@@ -291,9 +292,11 @@
           vasijasDesayuno: 89, vasijasAlmuerzo: 22, vasijasCena: 16,
           giovanniCena: 55, lobbyBar: 122, roomService: 18, banquetes: 190
         },
-        breakfastRev: {
-          directSalon: 742500.00,
-          packageIncluded: 1910000.00
+        vasijasShiftsRev: {
+          desayunoDirecto: 742500.00,
+          desayunoPaquete: 1910000.00,
+          almuerzoFood: 1648000.00, almuerzoBev: 225000.00,
+          cenaFood: 1200805.81, cenaBev: 162355.37
         }
       },
       '2026-11-13': {
@@ -305,9 +308,11 @@
           vasijasDesayuno: 160, vasijasAlmuerzo: 45, vasijasCena: 37,
           giovanniCena: 58, lobbyBar: 122, roomService: 11, banquetes: 240
         },
-        breakfastRev: {
-          directSalon: 1320000.00,
-          packageIncluded: 3480000.00
+        vasijasShiftsRev: {
+          desayunoDirecto: 1320000.00,
+          desayunoPaquete: 3480000.00,
+          almuerzoFood: 2318000.00, almuerzoBev: 210000.00,
+          cenaFood: 1910429.75, cenaBev: 174710.76
         }
       },
       '2026-11-14': {
@@ -319,9 +324,11 @@
           vasijasDesayuno: 165, vasijasAlmuerzo: 42, vasijasCena: 35,
           giovanniCena: 85, lobbyBar: 122, roomService: 11, banquetes: 296
         },
-        breakfastRev: {
-          directSalon: 1480000.00,
-          packageIncluded: 3650000.00
+        vasijasShiftsRev: {
+          desayunoDirecto: 1480000.00,
+          desayunoPaquete: 3650000.00,
+          almuerzoFood: 2795000.00, almuerzoBev: 472000.00,
+          cenaFood: 2321363.65, cenaBev: 392214.88
         }
       },
       '2026-11-15': {
@@ -333,9 +340,11 @@
           vasijasDesayuno: 170, vasijasAlmuerzo: 45, vasijasCena: 30,
           giovanniCena: 0, lobbyBar: 122, roomService: 11, banquetes: 175
         },
-        breakfastRev: {
-          directSalon: 1610000.00,
-          packageIncluded: 3590000.00
+        vasijasShiftsRev: {
+          desayunoDirecto: 1610000.00,
+          desayunoPaquete: 3590000.00,
+          almuerzoFood: 5480000.00, almuerzoBev: 856000.00,
+          cenaFood: 3651479.34, cenaBev: 571685.94
         }
       },
       '2026-11-16': {
@@ -347,9 +356,11 @@
           vasijasDesayuno: 120, vasijasAlmuerzo: 30, vasijasCena: 25,
           giovanniCena: 0, lobbyBar: 107, roomService: 4, banquetes: 144
         },
-        breakfastRev: {
-          directSalon: 1120000.00,
-          packageIncluded: 2580000.00
+        vasijasShiftsRev: {
+          desayunoDirecto: 1120000.00,
+          desayunoPaquete: 2580000.00,
+          almuerzoFood: 3340000.00, almuerzoBev: 472000.00,
+          cenaFood: 2774550.01, cenaBev: 392214.88
         }
       },
       '2026-11-17': {
@@ -361,9 +372,11 @@
           vasijasDesayuno: 165, vasijasAlmuerzo: 42, vasijasCena: 35,
           giovanniCena: 48, lobbyBar: 69, roomService: 16, banquetes: 126
         },
-        breakfastRev: {
-          directSalon: 1540000.00,
-          packageIncluded: 3540000.00
+        vasijasShiftsRev: {
+          desayunoDirecto: 1540000.00,
+          desayunoPaquete: 3540000.00,
+          almuerzoFood: 5120000.00, almuerzoBev: 405000.00,
+          cenaFood: 4280836.36, cenaBev: 332685.94
         }
       },
       '2026-11-18': {
@@ -375,9 +388,11 @@
           vasijasDesayuno: 59, vasijasAlmuerzo: 16, vasijasCena: 12,
           giovanniCena: 19, lobbyBar: 51, roomService: 9, banquetes: 134
         },
-        breakfastRev: {
-          directSalon: 520000.00,
-          packageIncluded: 1290000.00
+        vasijasShiftsRev: {
+          desayunoDirecto: 520000.00,
+          desayunoPaquete: 1290000.00,
+          almuerzoFood: 2580000.00, almuerzoBev: 142000.00,
+          cenaFood: 1933941.32, cenaBev: 109239.67
         }
       }
     };
@@ -392,9 +407,11 @@
           vasijasDesayuno: 2510, vasijasAlmuerzo: 640, vasijasCena: 530,
           giovanniCena: 790, lobbyBar: 1090, roomService: 280, banquetes: 2420
         },
-        breakfastRev: {
-          directSalon: 21850000.00,
-          packageIncluded: 53400000.00
+        vasijasShiftsRev: {
+          desayunoDirecto: 21850000.00,
+          desayunoPaquete: 53400000.00,
+          almuerzoFood: 39400000.00, almuerzoBev: 6450000.00,
+          cenaFood: 32579724.19, cenaBev: 5348719.26
         }
       },
       ytd: {
@@ -406,9 +423,11 @@
           vasijasDesayuno: 38200, vasijasAlmuerzo: 9800, vasijasCena: 8200,
           giovanniCena: 12400, lobbyBar: 16100, roomService: 4700, banquetes: 41200
         },
-        breakfastRev: {
-          directSalon: 318400000.00,
-          packageIncluded: 795200000.00
+        vasijasShiftsRev: {
+          desayunoDirecto: 318400000.00,
+          desayunoPaquete: 795200000.00,
+          almuerzoFood: 492000000.00, almuerzoBev: 60800000.00,
+          cenaFood: 408493739.32, cenaBev: 49863574.16
         }
       }
     };
@@ -419,25 +438,25 @@
     const revenueLines = [
       // HABITACIONES
       {
-        sector: 'ROOMS', category: 'Alojamiento Puro',
+        sector: 'ROOMS', category: 'Alojamiento Puro', serviceKey: 'ROOMS',
         name: 'Habitaciones Transients (Individuales / Corporativos)',
         days: { '2026-11-11': 12202612.82, '2026-11-12': 15235022.41, '2026-11-13': 11157272.24, '2026-11-14': 20560260.41, '2026-11-15': 8467306.79,  '2026-11-16': 9406603.04,  '2026-11-17': 15632753.97, '2026-11-18': 7925158.54 },
         mtd: 184420110.40, ytd: 2385120400.19, kpi: '639 hab. en 8 días'
       },
       {
-        sector: 'ROOMS', category: 'Alojamiento Puro',
+        sector: 'ROOMS', category: 'Alojamiento Puro', serviceKey: 'ROOMS',
         name: 'Habitaciones Grupos (Eventos & Convenciones)',
         days: { '2026-11-11': 3660604.50, '2026-11-12': 811772.00,  '2026-11-13': 1364602.50, '2026-11-14': 0.00, '2026-11-15': 608829.00,  '2026-11-16': 1958894.50, '2026-11-17': 2040000.00, '2026-11-18': 361202.00 },
         mtd: 64250240.24, ytd: 752452009.40, kpi: '56 hab. en 8 días'
       },
       {
-        sector: 'ROOMS', category: 'Alojamiento Puro',
+        sector: 'ROOMS', category: 'Alojamiento Puro', serviceKey: 'ROOMS',
         name: 'Habitaciones Tripulación (Crews)',
         days: { '2026-11-11': 157500.00, '2026-11-12': 157500.00, '2026-11-13': 315000.00, '2026-11-14': 157500.00, '2026-11-15': 464589.69, '2026-11-16': 465025.00, '2026-11-17': 0.00,      '2026-11-18': 0.00 },
         mtd: 7955000.00, ytd: 117600000.00, kpi: '14 hab. en 8 días'
       },
       {
-        sector: 'ROOMS', category: 'Paquetes Hab.',
+        sector: 'ROOMS', category: 'Paquetes Hab.', serviceKey: 'ROOMS',
         name: 'Paquetes de Alojamiento (Desayuno Incluido / Spa / Cód. 199)',
         days: { '2026-11-11': 4738021.37, '2026-11-12': 5719896.83, '2026-11-13': 5462441.58, '2026-11-14': 9424667.85, '2026-11-15': 3844340.76, '2026-11-16': 6852890.50, '2026-11-17': 7303784.54, '2026-11-18': 3844340.76 },
         mtd: 84950830.06, ytd: 962760220.41, kpi: 'Incluye Desayunos Paquete'
@@ -445,67 +464,67 @@
 
       // RESTAURANTES & BANQUETES
       {
-        sector: 'AB', category: 'Las Vasijas',
+        sector: 'AB', category: 'Las Vasijas', serviceKey: 'VASIJAS',
         name: 'Las Vasijas — Alimentos (Desayuno Directo, Almuerzo y Cena)',
         days: { '2026-11-11': 1257305.78,  '2026-11-12': 3591305.81, '2026-11-13': 5548429.75,  '2026-11-14': 6596363.65, '2026-11-15': 10741479.34, '2026-11-16': 7234550.01, '2026-11-17': 10940836.36, '2026-11-18': 5033941.32 },
         mtd: 93829724.19, ytd: 1218893739.32, kpi: '1.443 cub. en 8 días'
       },
       {
-        sector: 'AB', category: 'Las Vasijas',
+        sector: 'AB', category: 'Las Vasijas', serviceKey: 'VASIJAS',
         name: 'Las Vasijas — Bebidas',
         days: { '2026-11-11': 166611.57,  '2026-11-12': 387355.37, '2026-11-13': 384710.76, '2026-11-14': 864214.88, '2026-11-15': 1427685.94, '2026-11-16': 864214.88, '2026-11-17': 737685.94, '2026-11-18': 251239.67 },
         mtd: 11798719.26, ytd: 110663574.16, kpi: 'Bebidas Salón Principal'
       },
       {
-        sector: 'AB', category: 'Don Giovanni',
+        sector: 'AB', category: 'Don Giovanni', serviceKey: 'DON_GIOVANNI',
         name: 'Don Giovanni — Alimentos (Cena)',
         days: { '2026-11-11': 4487231.40, '2026-11-12': 1824421.48, '2026-11-13': 2316776.84, '2026-11-14': 4487231.40, '2026-11-15': 0.00,       '2026-11-16': 0.00,       '2026-11-17': 3630165.28, '2026-11-18': 1273140.49 },
         mtd: 19037364.31, ytd: 237644462.13, kpi: '323 cub. en 8 días'
       },
       {
-        sector: 'AB', category: 'Don Giovanni',
+        sector: 'AB', category: 'Don Giovanni', serviceKey: 'DON_GIOVANNI',
         name: 'Don Giovanni — Bebidas & Bodega',
         days: { '2026-11-11': 1511157.02, '2026-11-12': 626033.06, '2026-11-13': 556611.58, '2026-11-14': 1511157.02, '2026-11-15': 0.00,       '2026-11-16': 0.00,      '2026-11-17': 954958.68, '2026-11-18': 292561.98 },
         mtd: 4946958.65, ytd: 75742991.81, kpi: 'Vinos & Coctelería'
       },
       {
-        sector: 'AB', category: 'Lobby Bar',
+        sector: 'AB', category: 'Lobby Bar', serviceKey: 'LOBBY_BAR',
         name: 'Lobby Bar — Alimentos & Cafetería',
         days: { '2026-11-11': 1229999.99, '2026-11-12': 1299132.24, '2026-11-13': 1202314.07, '2026-11-14': 3499752.08, '2026-11-15': 2627396.68, '2026-11-16': 1604050.12, '2026-11-17': 2158842.98, '2026-11-18': 1207809.92 },
         mtd: 28820561.71, ytd: 366858237.54, kpi: '837 cub. en 8 días'
       },
       {
-        sector: 'AB', category: 'Lobby Bar',
+        sector: 'AB', category: 'Lobby Bar', serviceKey: 'LOBBY_BAR',
         name: 'Lobby Bar — Bebidas',
         days: { '2026-11-11': 2090495.87, '2026-11-12': 1389504.14, '2026-11-13': 1506198.35, '2026-11-14': 1610743.82, '2026-11-15': 1211322.30, '2026-11-16': 1636281.03, '2026-11-17': 416694.22,  '2026-11-18': 1389504.14 },
         mtd: 6531942.34, ytd: 92478290.96, kpi: 'Barra & Tragos'
       },
       {
-        sector: 'AB', category: 'Room Service',
+        sector: 'AB', category: 'Room Service', serviceKey: 'ROOM_SERVICE',
         name: 'Room Service — Alimentos y Bebidas',
         days: { '2026-11-11': 322066.11, '2026-11-12': 491735.54, '2026-11-13': 314214.87, '2026-11-14': 313471.08, '2026-11-15': 337355.38, '2026-11-16': 196400.00, '2026-11-17': 520057.01, '2026-11-18': 312644.63 },
         mtd: 8165031.26, ytd: 113866146.97, kpi: '91 cub. en 8 días'
       },
       {
-        sector: 'AB', category: 'Room Service',
+        sector: 'AB', category: 'Room Service', serviceKey: 'ROOM_SERVICE',
         name: 'La Federala & Pool Snack',
         days: { '2026-11-11': 0.00,      '2026-11-12': 0.00,       '2026-11-13': 0.00, '2026-11-14': 0.00, '2026-11-15': 0.00,      '2026-11-16': 3992198.35, '2026-11-17': 0.00, '2026-11-18': 0.00 },
         mtd: 6545867.74, ytd: 95820440.15, kpi: 'Outlets Estacionales'
       },
       {
-        sector: 'AB', category: 'Banquetes',
+        sector: 'AB', category: 'Banquetes', serviceKey: 'BANQUETES',
         name: 'Banquetes — Comestibles (Alimentos)',
         days: { '2026-11-11': 12785838.51, '2026-11-12': 10539600.00, '2026-11-13': 12737000.00, '2026-11-14': 11748680.00, '2026-11-15': 10348680.00, '2026-11-16': 3736000.00,  '2026-11-17': 6961983.48,  '2026-11-18': 4487231.40 },
         mtd: 151060811.34, ytd: 2639711126.92, kpi: '1.604 cub. en 8 días'
       },
       {
-        sector: 'AB', category: 'Banquetes',
+        sector: 'AB', category: 'Banquetes', serviceKey: 'BANQUETES',
         name: 'Banquetes — Bebidas',
         days: { '2026-11-11': 550000.00,  '2026-11-12': 360000.00, '2026-11-13': 320000.00, '2026-11-14': 448800.00, '2026-11-15': 1848800.00, '2026-11-16': 341600.00, '2026-11-17': 615785.12, '2026-11-18': 360000.00 },
         mtd: 12194421.48, ytd: 195321450.20, kpi: 'Bebidas Eventos'
       },
       {
-        sector: 'AB', category: 'Banquetes',
+        sector: 'AB', category: 'Banquetes', serviceKey: 'BANQUETES',
         name: 'Banquetes — Alquiler de Salones, Audio/Video y Varios',
         days: { '2026-11-11': 6133279.50, '2026-11-12': 6343875.00, '2026-11-13': 5192500.00, '2026-11-14': 3769320.00, '2026-11-15': 3769320.00, '2026-11-16': 3330000.00, '2026-11-17': 1996610.07, '2026-11-18': 1996610.07 },
         mtd: 110308708.22, ytd: 1748419639.84, kpi: 'Salones + Equipamiento AV'
@@ -513,25 +532,25 @@
 
       // SPA, HEALTH CLUB & OTROS
       {
-        sector: 'SPA', category: 'Health Club & Spa',
+        sector: 'SPA', category: 'Health Club & Spa', serviceKey: 'SPA',
         name: 'Health Club — Paquetes Spa / Alojamiento',
         days: { '2026-11-11': 1709611.56, '2026-11-12': 2148759.48, '2026-11-13': 1890878.80, '2026-11-14': 3168889.84, '2026-11-15': 1709611.56, '2026-11-16': 1804949.55, '2026-11-17': 1848660.27, '2026-11-18': 1848660.27 },
         mtd: 15420000.00, ytd: 342100000.00, kpi: 'Paquetes Spa'
       },
       {
-        sector: 'SPA', category: 'Health Club & Spa',
+        sector: 'SPA', category: 'Health Club & Spa', serviceKey: 'SPA',
         name: 'Health Club — Pases Diarios, Masajes e Iobella',
         days: { '2026-11-11': 2597520.66, '2026-11-12': 1252314.06, '2026-11-13': 735702.48, '2026-11-14': 2519421.49, '2026-11-15': 1976033.06, '2026-11-16': 1042148.75, '2026-11-17': 671620.66, '2026-11-18': 1252314.06 },
         mtd: 6420120.45, ytd: 143020310.12, kpi: 'Membresías y Pases'
       },
       {
-        sector: 'SPA', category: 'Parking',
+        sector: 'SPA', category: 'Parking', serviceKey: 'SPA',
         name: 'Estacionamiento (Parking & Cocheras)',
         days: { '2026-11-11': 941570.25,  '2026-11-12': 954297.52, '2026-11-13': 1034710.74, '2026-11-14': 1364049.59, '2026-11-15': 1364049.59, '2026-11-16': 989669.42, '2026-11-17': 1081404.96, '2026-11-18': 954297.52 },
         mtd: 9850210.15, ytd: 198450120.40, kpi: 'Parking Huéspedes y Eventos'
       },
       {
-        sector: 'SPA', category: 'Otros Departamentos',
+        sector: 'SPA', category: 'Otros Departamentos', serviceKey: 'SPA',
         name: 'Lavandería, Teléfonos, Internet, Minibar y Misceláneos',
         days: { '2026-11-11': 127809.93, '2026-11-12': 128141.08, '2026-11-13': 147603.32, '2026-11-14': 160925.48, '2026-11-15': 40876.56,  '2026-11-16': 106184.19, '2026-11-17': 123599.16, '2026-11-18': 128465.83 },
         mtd: 6654904.20, ytd: 96550228.78, kpi: 'Varios Departamentos'
@@ -563,7 +582,11 @@
             vasijasDesayuno: 0, vasijasAlmuerzo: 0, vasijasCena: 0,
             giovanniCena: 0, lobbyBar: 0, roomService: 0, banquetes: 0
           },
-          breakfastRev: { directSalon: 0, packageIncluded: 0 }
+          vasijasShiftsRev: {
+            desayunoDirecto: 0, desayunoPaquete: 0,
+            almuerzoFood: 0, almuerzoBev: 0,
+            cenaFood: 0, cenaBev: 0
+          }
         };
         DATES_LIST.forEach(dt => {
           const o = dailyOps[dt];
@@ -587,8 +610,12 @@
           sum.coversDetail.lobbyBar += o.coversDetail.lobbyBar;
           sum.coversDetail.roomService += o.coversDetail.roomService;
           sum.coversDetail.banquetes += o.coversDetail.banquetes;
-          sum.breakfastRev.directSalon += o.breakfastRev.directSalon;
-          sum.breakfastRev.packageIncluded += o.breakfastRev.packageIncluded;
+          sum.vasijasShiftsRev.desayunoDirecto += o.vasijasShiftsRev.desayunoDirecto;
+          sum.vasijasShiftsRev.desayunoPaquete += o.vasijasShiftsRev.desayunoPaquete;
+          sum.vasijasShiftsRev.almuerzoFood += o.vasijasShiftsRev.almuerzoFood;
+          sum.vasijasShiftsRev.almuerzoBev += o.vasijasShiftsRev.almuerzoBev;
+          sum.vasijasShiftsRev.cenaFood += o.vasijasShiftsRev.cenaFood;
+          sum.vasijasShiftsRev.cenaBev += o.vasijasShiftsRev.cenaBev;
         });
         return buildComputedOps(sum, 'cons8', date);
       }
@@ -641,8 +668,20 @@
       if (state.sector !== 'ALL') {
         items = items.filter(i => i.sector === state.sector);
       }
-      if (state.sector === 'AB' && state.outletFilter !== 'ALL') {
-        items = items.filter(i => i.category === state.outletFilter);
+      if (state.sector === 'AB') {
+        const focusToServiceKey = {
+          DESAYUNO: 'VASIJAS',
+          ALMUERZO: 'VASIJAS',
+          CENA_VASIJAS: 'VASIJAS',
+          DON_GIOVANNI: 'DON_GIOVANNI',
+          LOBBY_BAR: 'LOBBY_BAR',
+          ROOM_SERVICE: 'ROOM_SERVICE',
+          BANQUETES: 'BANQUETES'
+        };
+        const targetKey = focusToServiceKey[state.serviceFocus];
+        if (targetKey) {
+          items = items.filter(i => i.serviceKey === targetKey);
+        }
       }
       return items;
     }
@@ -680,7 +719,6 @@
 
     function setSector(sector) {
       state.sector = sector;
-      if (sector !== 'AB') state.outletFilter = 'ALL';
       ['ALL', 'ROOMS', 'AB', 'SPA'].forEach(s => {
         const btn = document.getElementById('sec-' + s);
         if (s === sector) {
@@ -694,8 +732,8 @@
       updateAll();
     }
 
-    function setOutletFilter(outlet) {
-      state.outletFilter = outlet;
+    function setServiceFocus(focusKey) {
+      state.serviceFocus = focusKey;
       updateAll();
     }
 
@@ -730,7 +768,7 @@
       const sectorNames = {
         ALL: 'Vista Consolidada Hotel',
         ROOMS: 'Habitaciones & Segmentos',
-        AB: state.outletFilter === 'ALL' ? 'Restaurantes & Banquetes (Todos)' : `Outlet: ${state.outletFilter}`,
+        AB: 'Restaurantes, Turnos & Banquetes',
         SPA: 'Spa, Health Club & Otros'
       };
       document.getElementById('active-filter-badge').innerText = `Viendo: ${sectorNames[state.sector]}`;
@@ -775,7 +813,7 @@
               <strong class="text-slate-900">${formatMoney(ops.avgOutlets)}</strong>
             </div>
             <div class="flex justify-between">
-              <span>Desayuno Vasijas: <strong>${formatIntAR(ops.coversDetail.vasijasDesayuno)} cub.</strong></span>
+              <span>Las Vasijas Total: <strong>${formatIntAR(ops.vasijasTotalCovers)} cub.</strong></span>
               <span class="text-amber-700 font-semibold">${formatPct((ops.outletsRev / ops.totalHotelRev) * 100)} Hotel</span>
             </div>
           </div>
@@ -830,22 +868,32 @@
     }
 
     // =========================================================================
-    // 7. PANEL DINÁMICO DE DETALLE (DESAYUNO, OUTLETS POR RESTAURANTE, HABITACIONES)
+    // 7. PANEL DINÁMICO DE MONITOR POR TURNO Y RESTAURANTE / HABITACIONES / SPA
     // =========================================================================
     function renderSpotlight() {
       const ops = getConsolidatedOps();
       const spotlight = document.getElementById('sector-spotlight');
       const cd = ops.coversDetail;
-      const bf = ops.breakfastRev;
-      const bfTotalRev = bf.directSalon + bf.packageIncluded;
-      const bfAvgTicket = cd.vasijasDesayuno > 0 ? bfTotalRev / cd.vasijasDesayuno : 0;
+      const vs = ops.vasijasShiftsRev;
 
-      // Facturación por cada restaurante
+      // Facturación por cada restaurante/servicio
       const vasTot = getItemValue(revenueLines[4]) + getItemValue(revenueLines[5]);
-      const gioTot = getItemValue(revenueLines[6]) + getItemValue(revenueLines[7]);
-      const lobTot = getItemValue(revenueLines[8]) + getItemValue(revenueLines[9]);
-      const rsTot  = getItemValue(revenueLines[10]) + getItemValue(revenueLines[11]);
-      const banqTot = ops.banquetsRev;
+      const gioFood = getItemValue(revenueLines[6]);
+      const gioBev  = getItemValue(revenueLines[7]);
+      const gioTot  = gioFood + gioBev;
+
+      const lobFood = getItemValue(revenueLines[8]);
+      const lobBev  = getItemValue(revenueLines[9]);
+      const lobTot  = lobFood + lobBev;
+
+      const rsDirect = getItemValue(revenueLines[10]);
+      const rsPool   = getItemValue(revenueLines[11]);
+      const rsTot    = rsDirect + rsPool;
+
+      const banqFood  = getItemValue(revenueLines[12]);
+      const banqBev   = getItemValue(revenueLines[13]);
+      const banqSal   = getItemValue(revenueLines[14]);
+      const banqTot   = banqFood + banqBev + banqSal;
 
       const totalAllCovers = ops.vasijasTotalCovers + cd.giovanniCena + cd.lobbyBar + cd.roomService + cd.banquetes || 1;
 
@@ -940,156 +988,196 @@
           </div>
         `;
       } else {
-        // VISTA CONSOLIDADA ('ALL') O RESTAURANTES & BANQUETES ('AB')
-        const outletsList = [
-          { id: 'ALL', label: 'Todos los Restaurantes & Banq.' },
-          { id: 'Las Vasijas', label: 'Las Vasijas' },
-          { id: 'Don Giovanni', label: 'Don Giovanni' },
-          { id: 'Lobby Bar', label: 'Lobby Bar' },
-          { id: 'Room Service', label: 'Room Service' },
-          { id: 'Banquetes', label: 'Banquetes' }
+        // =====================================================================
+        // MONITOR INTERACTIVO DE SERVICIOS Y TURNOS (DESAYUNO, ALMUERZO, CENAS, EVENTOS)
+        // =====================================================================
+        const serviceTabs = [
+          { id: 'DESAYUNO',     label: 'Vasijas · Desayuno', icon: 'coffee' },
+          { id: 'ALMUERZO',     label: 'Vasijas · Almuerzo', icon: 'sun' },
+          { id: 'CENA_VASIJAS', label: 'Vasijas · Cena',     icon: 'moon' },
+          { id: 'DON_GIOVANNI', label: 'Don Giovanni',       icon: 'wine' },
+          { id: 'LOBBY_BAR',    label: 'Lobby Bar',          icon: 'martini' },
+          { id: 'ROOM_SERVICE', label: 'Room Service & Pool',icon: 'bell' },
+          { id: 'BANQUETES',    label: 'Banquetes & Eventos',icon: 'party-popper' }
         ];
 
-        const filterPills = state.sector === 'AB' ? `
-          <div class="flex flex-wrap items-center gap-1.5 mb-4 pb-3 border-b border-slate-100">
-            <span class="text-xs font-semibold text-slate-500 mr-1">Filtrar Restaurante:</span>
-            ${outletsList.map(o => `
-              <button onclick="setOutletFilter('${o.id}')"
-                class="outlet-pill ${state.outletFilter === o.id ? 'active' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-transparent'} px-3 py-1.5 rounded-lg text-xs border transition">
-                ${o.label}
-              </button>
-            `).join('')}
-          </div>
-        ` : '';
+        // Configuración dinámica de las 4 tarjetas según el servicio elegido
+        let monitorTitle = '';
+        let monitorBadge = '';
+        let monitorTheme = 'from-amber-50 to-orange-50/60 border-amber-200';
+        let monitorCards = [];
+
+        if (state.serviceFocus === 'DESAYUNO') {
+          const bfTotal = vs.desayunoDirecto + vs.desayunoPaquete;
+          const bfAvg = cd.vasijasDesayuno > 0 ? bfTotal / cd.vasijasDesayuno : 0;
+          monitorTitle = `Monitor de Desayunos — Las Vasijas (${ops.label})`;
+          monitorBadge = `Ticket Promedio Desayuno: ${formatMoney(bfAvg)}`;
+          monitorTheme = 'from-amber-50 to-orange-50/60 border-amber-200';
+          monitorCards = [
+            { title: 'Cubiertos Desayuno', val: `${formatIntAR(cd.vasijasDesayuno)} cub.`, sub: 'Turno mañana Las Vasijas' },
+            { title: 'Facturación Directa (Salón)', val: formatMoney(vs.desayunoDirecto), sub: 'Pago diferencial / Walk-in' },
+            { title: 'Incluido en Paquete Hab.', val: formatMoney(vs.desayunoPaquete), sub: 'Imputado desde Cód. 199', highlight: 'text-blue-700' },
+            { title: 'Facturación Total Desayuno', val: formatMoney(bfTotal), sub: 'Directo + Paquetes Alojamiento', isDark: true }
+          ];
+        } else if (state.serviceFocus === 'ALMUERZO') {
+          const almTotal = vs.almuerzoFood + vs.almuerzoBev;
+          const almAvg = cd.vasijasAlmuerzo > 0 ? almTotal / cd.vasijasAlmuerzo : 0;
+          monitorTitle = `Monitor de Almuerzos — Las Vasijas (${ops.label})`;
+          monitorBadge = `Ticket Promedio Almuerzo: ${formatMoney(almAvg)}`;
+          monitorTheme = 'from-amber-50 to-yellow-50/60 border-amber-200';
+          monitorCards = [
+            { title: 'Cubiertos Almuerzo', val: `${formatIntAR(cd.vasijasAlmuerzo)} cub.`, sub: 'Turno mediodía Las Vasijas' },
+            { title: 'Alimentos Almuerzo', val: formatMoney(vs.almuerzoFood), sub: 'Carta / Buffet Ejecutivo' },
+            { title: 'Bebidas Almuerzo', val: formatMoney(vs.almuerzoBev), sub: 'Bebidas sin alcohol y vinos' },
+            { title: 'Facturación Total Almuerzo', val: formatMoney(almTotal), sub: 'Alimentos + Bebidas mediodía', isDark: true }
+          ];
+        } else if (state.serviceFocus === 'CENA_VASIJAS') {
+          const cenaTotal = vs.cenaFood + vs.cenaBev;
+          const cenaAvg = cd.vasijasCena > 0 ? cenaTotal / cd.vasijasCena : 0;
+          monitorTitle = `Monitor de Cenas — Las Vasijas (${ops.label})`;
+          monitorBadge = `Ticket Promedio Cena Vasijas: ${formatMoney(cenaAvg)}`;
+          monitorTheme = 'from-slate-100 to-amber-50/40 border-slate-300';
+          monitorCards = [
+            { title: 'Cubiertos Cena Vasijas', val: `${formatIntAR(cd.vasijasCena)} cub.`, sub: 'Turno noche Salón Principal' },
+            { title: 'Alimentos Cena', val: formatMoney(vs.cenaFood), sub: 'Carta nocturna Las Vasijas' },
+            { title: 'Bebidas Cena', val: formatMoney(vs.cenaBev), sub: 'Vinos, tragos y bebidas' },
+            { title: 'Facturación Total Cena', val: formatMoney(cenaTotal), sub: 'Alimentos + Bebidas noche', isDark: true }
+          ];
+        } else if (state.serviceFocus === 'DON_GIOVANNI') {
+          const gioAvg = cd.giovanniCena > 0 ? gioTot / cd.giovanniCena : 0;
+          monitorTitle = `Monitor Restaurante Don Giovanni — Cena (${ops.label})`;
+          monitorBadge = `Ticket Promedio Don Giovanni: ${formatMoney(gioAvg)}`;
+          monitorTheme = 'from-rose-50/70 to-slate-50 border-rose-200';
+          monitorCards = [
+            { title: 'Cubiertos Don Giovanni', val: `${formatIntAR(cd.giovanniCena)} cub.`, sub: 'Restaurante Italiano (Noche)' },
+            { title: 'Alimentos (Gastronomía)', val: formatMoney(gioFood), sub: `${formatPct(gioTot > 0 ? (gioFood / gioTot) * 100 : 0)} de la venta del outlet` },
+            { title: 'Bebidas & Bodega', val: formatMoney(gioBev), sub: `${formatPct(gioTot > 0 ? (gioBev / gioTot) * 100 : 0)} de la venta del outlet` },
+            { title: 'Facturación Total Don Giovanni', val: formatMoney(gioTot), sub: 'Alimentos + Bodega', isDark: true }
+          ];
+        } else if (state.serviceFocus === 'LOBBY_BAR') {
+          const lobAvg = cd.lobbyBar > 0 ? lobTot / cd.lobbyBar : 0;
+          monitorTitle = `Monitor Lobby Bar & Cafetería (${ops.label})`;
+          monitorBadge = `Ticket Promedio Lobby Bar: ${formatMoney(lobAvg)}`;
+          monitorTheme = 'from-slate-100 to-slate-50 border-slate-200';
+          monitorCards = [
+            { title: 'Cubiertos / Consumos', val: `${formatIntAR(cd.lobbyBar)} cub.`, sub: 'Cafetería, snacks y coctelería' },
+            { title: 'Alimentos & Cafetería', val: formatMoney(lobFood), sub: 'Pastelería, sándwiches y tapas' },
+            { title: 'Bebidas & Barra', val: formatMoney(lobBev), sub: 'Tragos, vinos y bebidas' },
+            { title: 'Facturación Total Lobby Bar', val: formatMoney(lobTot), sub: 'Alimentos + Bebidas', isDark: true }
+          ];
+        } else if (state.serviceFocus === 'ROOM_SERVICE') {
+          const rsAvg = cd.roomService > 0 ? rsTot / cd.roomService : 0;
+          monitorTitle = `Monitor Room Service & Pool Snack (${ops.label})`;
+          monitorBadge = `Ticket Promedio Room Service: ${formatMoney(rsAvg)}`;
+          monitorTheme = 'from-cyan-50/60 to-slate-50 border-cyan-200';
+          monitorCards = [
+            { title: 'Cubiertos / Pedidos', val: `${formatIntAR(cd.roomService)} cub.`, sub: 'Servicio a la habitación' },
+            { title: 'Room Service (24 hs)', val: formatMoney(rsDirect), sub: 'Pedidos directos en habitaciones' },
+            { title: 'La Federala & Pool Snack', val: formatMoney(rsPool), sub: 'Outlets exteriores / eventos' },
+            { title: 'Facturación Total RS & Pool', val: formatMoney(rsTot), sub: 'Room Service + Pool', isDark: true }
+          ];
+        } else if (state.serviceFocus === 'BANQUETES') {
+          const banqAvg = cd.banquetes > 0 ? banqTot / cd.banquetes : 0;
+          monitorTitle = `Monitor Banquetes & Convenciones (${ops.label})`;
+          monitorBadge = `Promedio por Cubierto Evento: ${formatMoney(banqAvg)}`;
+          monitorTheme = 'from-indigo-50/80 to-blue-50/50 border-indigo-200';
+          monitorCards = [
+            { title: 'Cubiertos Eventos', val: `${formatIntAR(cd.banquetes)} cub.`, sub: 'Asistentes corporativos y sociales' },
+            { title: 'Comestibles y Bebidas', val: formatMoney(banqFood + banqBev), sub: `Alim: ${formatMoney(banqFood)} · Beb: ${formatMoney(banqBev)}` },
+            { title: 'Alquiler Salones & AV', val: formatMoney(banqSal), sub: 'Salones, equipamiento y varios' },
+            { title: 'Facturación Total Banquetes', val: formatMoney(banqTot), sub: 'Gastronomía + Salones', isDark: true }
+          ];
+        }
 
         spotlight.innerHTML = `
           <div class="space-y-5">
-            ${filterPills}
+            <!-- BOTONERA DE FILTRO RÁPIDO POR TURNO / RESTAURANTE / EVENTOS -->
+            <div>
+              <div class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1.5">
+                <i data-lucide="filter" class="w-3.5 h-3.5 text-amber-500"></i>
+                Seleccioná un Servicio o Turno para ver su detalle:
+              </div>
+              <div class="flex flex-wrap items-center gap-1.5">
+                ${serviceTabs.map(t => `
+                  <button onclick="setServiceFocus('${t.id}')"
+                    class="service-pill ${state.serviceFocus === t.id ? 'active' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200/70'} flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border transition">
+                    <i data-lucide="${t.icon}" class="w-3.5 h-3.5"></i>
+                    ${t.label}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
 
-            <!-- MONITOR DE DESAYUNO (LAS VASIJAS: CUBIERTOS + FACTURACIÓN DIRECTA VS PAQUETES) -->
-            <div class="p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50/60 border border-amber-200">
+            <!-- MONITOR DINÁMICO DEL SERVICIO SELECCIONADO -->
+            <div class="p-4 rounded-xl bg-gradient-to-r ${monitorTheme} border">
               <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                <h4 class="text-sm font-bold text-amber-950 flex items-center gap-2">
-                  <i data-lucide="coffee" class="w-4 h-4 text-amber-600"></i>
-                  Monitor de Desayunos — Las Vasijas (${ops.label})
+                <h4 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <i data-lucide="bar-chart-3" class="w-4 h-4 text-amber-600"></i>
+                  ${monitorTitle}
                 </h4>
                 <span class="text-xs font-bold px-2.5 py-1 rounded-md bg-amber-500 text-slate-950">
-                  Ticket Promedio Desayuno: ${formatMoney(bfAvgTicket)}
+                  ${monitorBadge}
                 </span>
               </div>
 
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                <div class="bg-white/90 p-3 rounded-lg border border-amber-200/80">
-                  <div class="text-[11px] font-semibold text-slate-500 uppercase">Cubiertos Desayuno</div>
-                  <div class="text-xl font-extrabold text-slate-900 mt-0.5">${formatIntAR(cd.vasijasDesayuno)} cub.</div>
-                  <div class="text-[11px] text-amber-800 mt-0.5">Turno mañana Las Vasijas</div>
-                </div>
-                <div class="bg-white/90 p-3 rounded-lg border border-amber-200/80">
-                  <div class="text-[11px] font-semibold text-slate-500 uppercase">Facturación Directa (Salón)</div>
-                  <div class="text-xl font-extrabold text-slate-900 mt-0.5">${formatMoney(bf.directSalon)}</div>
-                  <div class="text-[11px] text-slate-500 mt-0.5">Pago diferencial / Walk-in</div>
-                </div>
-                <div class="bg-white/90 p-3 rounded-lg border border-amber-200/80">
-                  <div class="text-[11px] font-semibold text-slate-500 uppercase">Incluido en Paquete Hab.</div>
-                  <div class="text-xl font-extrabold text-blue-700 mt-0.5">${formatMoney(bf.packageIncluded)}</div>
-                  <div class="text-[11px] text-slate-500 mt-0.5">Imputado desde Cód. 199</div>
-                </div>
-                <div class="bg-slate-900 text-white p-3 rounded-lg">
-                  <div class="text-[11px] font-semibold text-amber-400 uppercase">Facturación Total Desayuno</div>
-                  <div class="text-xl font-extrabold text-white mt-0.5">${formatMoney(bfTotalRev)}</div>
-                  <div class="text-[11px] text-slate-300 mt-0.5">Directo + Paquetes Alojamiento</div>
-                </div>
+                ${monitorCards.map(c => c.isDark ? `
+                  <div class="bg-slate-900 text-white p-3 rounded-lg">
+                    <div class="text-[11px] font-semibold text-amber-400 uppercase">${c.title}</div>
+                    <div class="text-xl font-extrabold text-white mt-0.5">${c.val}</div>
+                    <div class="text-[11px] text-slate-300 mt-0.5">${c.sub}</div>
+                  </div>
+                ` : `
+                  <div class="bg-white/95 p-3 rounded-lg border border-slate-200/80">
+                    <div class="text-[11px] font-semibold text-slate-500 uppercase">${c.title}</div>
+                    <div class="text-xl font-extrabold ${c.highlight || 'text-slate-900'} mt-0.5">${c.val}</div>
+                    <div class="text-[11px] text-slate-500 mt-0.5">${c.sub}</div>
+                  </div>
+                `).join('')}
               </div>
             </div>
 
-            <!-- RENDIMIENTO POR RESTAURANTE (CUBIERTOS, FACTURACIÓN Y PROMEDIO) -->
+            <!-- RESUMEN COMPARATIVO DE TODOS LOS RESTAURANTES -->
             <div>
-              <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <i data-lucide="utensils" class="w-4 h-4 text-amber-500"></i>
-                Facturación, Cubiertos y Ticket Promedio por Restaurante
+              <h4 class="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2.5 flex items-center justify-between">
+                <span>Resumen General por Restaurante & Banquetes (${ops.label})</span>
+                <span class="text-slate-900">Total General: ${formatIntAR(totalAllCovers)} cubiertos</span>
               </h4>
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                <div class="p-3 rounded-xl bg-amber-50/50 border border-amber-200/70">
-                  <div class="flex justify-between items-center">
-                    <span class="text-xs font-bold text-slate-900">Las Vasijas</span>
-                    <span class="text-[11px] font-bold text-amber-800">${formatIntAR(ops.vasijasTotalCovers)} cub.</span>
-                  </div>
-                  <div class="text-base font-extrabold text-slate-900 mt-1">${formatMoney(vasTot)}</div>
-                  <div class="text-[11px] text-slate-600 mt-1">Prom: <strong>${formatMoney(ops.vasijasTotalCovers > 0 ? vasTot / ops.vasijasTotalCovers : 0)}</strong></div>
-                </div>
-
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
-                  <div class="flex justify-between items-center">
-                    <span class="text-xs font-bold text-slate-900">Don Giovanni</span>
-                    <span class="text-[11px] font-bold text-slate-700">${formatIntAR(cd.giovanniCena)} cub.</span>
-                  </div>
-                  <div class="text-base font-extrabold text-slate-900 mt-1">${formatMoney(gioTot)}</div>
-                  <div class="text-[11px] text-slate-600 mt-1">Prom: <strong>${formatMoney(cd.giovanniCena > 0 ? gioTot / cd.giovanniCena : 0)}</strong></div>
-                </div>
-
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
-                  <div class="flex justify-between items-center">
-                    <span class="text-xs font-bold text-slate-900">Lobby Bar</span>
-                    <span class="text-[11px] font-bold text-slate-700">${formatIntAR(cd.lobbyBar)} cub.</span>
-                  </div>
-                  <div class="text-base font-extrabold text-slate-900 mt-1">${formatMoney(lobTot)}</div>
-                  <div class="text-[11px] text-slate-600 mt-1">Prom: <strong>${formatMoney(cd.lobbyBar > 0 ? lobTot / cd.lobbyBar : 0)}</strong></div>
-                </div>
-
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
-                  <div class="flex justify-between items-center">
-                    <span class="text-xs font-bold text-slate-900">Room Service</span>
-                    <span class="text-[11px] font-bold text-slate-700">${formatIntAR(cd.roomService)} cub.</span>
-                  </div>
-                  <div class="text-base font-extrabold text-slate-900 mt-1">${formatMoney(rsTot)}</div>
-                  <div class="text-[11px] text-slate-600 mt-1">Prom: <strong>${formatMoney(cd.roomService > 0 ? rsTot / cd.roomService : 0)}</strong></div>
-                </div>
-
-                <div class="p-3 rounded-xl bg-indigo-50/60 border border-indigo-200/70">
-                  <div class="flex justify-between items-center">
-                    <span class="text-xs font-bold text-indigo-950">Banquetes</span>
-                    <span class="text-[11px] font-bold text-indigo-800">${formatIntAR(cd.banquetes)} cub.</span>
-                  </div>
-                  <div class="text-base font-extrabold text-indigo-950 mt-1">${formatMoney(banqTot)}</div>
-                  <div class="text-[11px] text-indigo-800 mt-1">Prom: <strong>${formatMoney(cd.banquetes > 0 ? banqTot / cd.banquetes : 0)}</strong></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- APERTURA DETALLADA DE CUBIERTOS POR TURNO -->
-            <div class="pt-3 border-t border-slate-100">
-              <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-600">Detalle de Cubiertos por Turno y Servicio</span>
-                <span class="text-xs font-bold text-slate-900">Total General: ${formatIntAR(totalAllCovers)} cubiertos</span>
-              </div>
               <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-                <div class="p-2.5 rounded-lg bg-amber-50/70 border border-amber-200/70">
+                <div onclick="setServiceFocus('DESAYUNO')" class="cursor-pointer p-2.5 rounded-lg border transition ${state.serviceFocus === 'DESAYUNO' ? 'bg-amber-100 border-amber-400 ring-1 ring-amber-400' : 'bg-amber-50/60 border-amber-200/70 hover:bg-amber-50'}">
                   <div class="text-[11px] font-semibold text-amber-900">Vasijas · Desayuno</div>
-                  <div class="text-base font-extrabold text-slate-900">${formatIntAR(cd.vasijasDesayuno)}</div>
+                  <div class="text-base font-extrabold text-slate-900">${formatIntAR(cd.vasijasDesayuno)} cub.</div>
+                  <div class="text-[10px] text-slate-600">${formatMoney(vs.desayunoDirecto + vs.desayunoPaquete)}</div>
                 </div>
-                <div class="p-2.5 rounded-lg bg-amber-50/70 border border-amber-200/70">
+                <div onclick="setServiceFocus('ALMUERZO')" class="cursor-pointer p-2.5 rounded-lg border transition ${state.serviceFocus === 'ALMUERZO' ? 'bg-amber-100 border-amber-400 ring-1 ring-amber-400' : 'bg-amber-50/60 border-amber-200/70 hover:bg-amber-50'}">
                   <div class="text-[11px] font-semibold text-amber-900">Vasijas · Almuerzo</div>
-                  <div class="text-base font-extrabold text-slate-900">${formatIntAR(cd.vasijasAlmuerzo)}</div>
+                  <div class="text-base font-extrabold text-slate-900">${formatIntAR(cd.vasijasAlmuerzo)} cub.</div>
+                  <div class="text-[10px] text-slate-600">${formatMoney(vs.almuerzoFood + vs.almuerzoBev)}</div>
                 </div>
-                <div class="p-2.5 rounded-lg bg-amber-50/70 border border-amber-200/70">
+                <div onclick="setServiceFocus('CENA_VASIJAS')" class="cursor-pointer p-2.5 rounded-lg border transition ${state.serviceFocus === 'CENA_VASIJAS' ? 'bg-amber-100 border-amber-400 ring-1 ring-amber-400' : 'bg-amber-50/60 border-amber-200/70 hover:bg-amber-50'}">
                   <div class="text-[11px] font-semibold text-amber-900">Vasijas · Cena</div>
-                  <div class="text-base font-extrabold text-slate-900">${formatIntAR(cd.vasijasCena)}</div>
+                  <div class="text-base font-extrabold text-slate-900">${formatIntAR(cd.vasijasCena)} cub.</div>
+                  <div class="text-[10px] text-slate-600">${formatMoney(vs.cenaFood + vs.cenaBev)}</div>
                 </div>
-                <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200/70">
+                <div onclick="setServiceFocus('DON_GIOVANNI')" class="cursor-pointer p-2.5 rounded-lg border transition ${state.serviceFocus === 'DON_GIOVANNI' ? 'bg-slate-200 border-slate-500 ring-1 ring-slate-500' : 'bg-slate-50 border-slate-200/70 hover:bg-slate-100'}">
                   <div class="text-[11px] font-semibold text-slate-700">Don Giovanni</div>
-                  <div class="text-base font-extrabold text-slate-900">${formatIntAR(cd.giovanniCena)}</div>
+                  <div class="text-base font-extrabold text-slate-900">${formatIntAR(cd.giovanniCena)} cub.</div>
+                  <div class="text-[10px] text-slate-600">${formatMoney(gioTot)}</div>
                 </div>
-                <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200/70">
+                <div onclick="setServiceFocus('LOBBY_BAR')" class="cursor-pointer p-2.5 rounded-lg border transition ${state.serviceFocus === 'LOBBY_BAR' ? 'bg-slate-200 border-slate-500 ring-1 ring-slate-500' : 'bg-slate-50 border-slate-200/70 hover:bg-slate-100'}">
                   <div class="text-[11px] font-semibold text-slate-700">Lobby Bar</div>
-                  <div class="text-base font-extrabold text-slate-900">${formatIntAR(cd.lobbyBar)}</div>
+                  <div class="text-base font-extrabold text-slate-900">${formatIntAR(cd.lobbyBar)} cub.</div>
+                  <div class="text-[10px] text-slate-600">${formatMoney(lobTot)}</div>
                 </div>
-                <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200/70">
+                <div onclick="setServiceFocus('ROOM_SERVICE')" class="cursor-pointer p-2.5 rounded-lg border transition ${state.serviceFocus === 'ROOM_SERVICE' ? 'bg-slate-200 border-slate-500 ring-1 ring-slate-500' : 'bg-slate-50 border-slate-200/70 hover:bg-slate-100'}">
                   <div class="text-[11px] font-semibold text-slate-700">Room Service</div>
-                  <div class="text-base font-extrabold text-slate-900">${formatIntAR(cd.roomService)}</div>
+                  <div class="text-base font-extrabold text-slate-900">${formatIntAR(cd.roomService)} cub.</div>
+                  <div class="text-[10px] text-slate-600">${formatMoney(rsTot)}</div>
                 </div>
-                <div class="p-2.5 rounded-lg bg-indigo-50/70 border border-indigo-200/70">
+                <div onclick="setServiceFocus('BANQUETES')" class="cursor-pointer p-2.5 rounded-lg border transition ${state.serviceFocus === 'BANQUETES' ? 'bg-indigo-100 border-indigo-400 ring-1 ring-indigo-400' : 'bg-indigo-50/70 border-indigo-200/70 hover:bg-indigo-100/70'}">
                   <div class="text-[11px] font-semibold text-indigo-900">Banquetes</div>
-                  <div class="text-base font-extrabold text-indigo-950">${formatIntAR(cd.banquetes)}</div>
+                  <div class="text-base font-extrabold text-indigo-950">${formatIntAR(cd.banquetes)} cub.</div>
+                  <div class="text-[10px] text-indigo-700">${formatMoney(banqTot)}</div>
                 </div>
               </div>
             </div>
@@ -1100,7 +1188,7 @@
     }
 
     // =========================================================================
-    // 8. GRÁFICOS LIMPIOS (SOLO 2026, SIN COMPARATIVA AÑO PASADO)
+    // 8. GRÁFICOS LIMPIOS
     // =========================================================================
     let trendChartInstance = null;
     let mixChartInstance = null;
@@ -1173,7 +1261,6 @@
         }
       });
 
-      // Gráfico de participación
       const grouped = {};
       filtered.forEach(item => {
         const key = state.sector === 'ALL'
