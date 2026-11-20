@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reporte Daily Ejecutivo | Sheraton Pilar</title>
+  <!-- Tailwind CSS para diseño moderno y responsive -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js para gráficos interactivos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    .card-shadow { box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06); }
+    .active-tab { background-color: #0f172a; color: #ffffff; }
+  </style>
+</head>
+<body class="text-slate-800 antialiased pb-12">
+
+  <!-- HEADER EJECUTIVO -->
+  <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-amber-500 flex items-center justify-center font-bold text-slate-900 text-xl">
+          S
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg sm:text-xl font-bold tracking-tight">SHERATON PILAR HOTEL & CONVENTION CENTER</h1>
+            <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              Opera PMS Sync
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">
+            Fecha de Datos: <strong class="text-slate-200">Martes 17/11/2026</strong> · Fecha de Negocio: <strong class="text-slate-200">18/11/2026</strong> · TC Opera: <strong class="text-amber-400">\$1.500 ARS/USD</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- CONTROLES INTERACTIVOS (PERÍODO Y MONEDA) -->
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Selector Período -->
+        <div class="bg-slate-800 p-1 rounded-lg flex text-xs font-medium border border-slate-700">
+          <button onclick="setPeriod('day')" id="btn-day" class="px-3 py-1.5 rounded-md transition bg-amber-500 text-slate-900 font-semibold">
+            Día (17/11)
+          </button>
+          <button onclick="setPeriod('mtd')" id="btn-mtd" class="px-3 py-1.5 rounded-md transition text-slate-300 hover:text-white">
+            Mes (MTD)
+          </button>
+          <button onclick="setPeriod('ytd')" id="btn-ytd" class="px-3 py-1.5 rounded-md transition text-slate-300 hover:text-white">
+            Año (YTD)
+          </button>
+        </div>
+
+        <!-- Selector Moneda -->
+        <div class="bg-slate-800 p-1 rounded-lg flex text-xs font-medium border border-slate-700">
+          <button onclick="setCurrency('ARS')" id="btn-ars" class="px-3 py-1.5 rounded-md transition bg-white text-slate-900 font-semibold">
+            ARS ($)
+          </button>
+          <button onclick="setCurrency('USD')" id="btn-usd" class="px-3 py-1.5 rounded-md transition text-slate-300 hover:text-white">
+            USD (u$s)
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6">
+
+    <!-- TARJETAS KPI PRINCIPALES -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- KPI 1: Venta Total -->
+      <div class="bg-white rounded-xl p-5 card-shadow border border-slate-100">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400" id="kpi-rev-label">Venta Total Hotel (Día)</span>
+          <span class="p-2 rounded-lg bg-emerald-50 text-emerald-600"><i data-lucide="dollar-sign" class="w-4 h-4"></i></span>
+        </div>
+        <div class="mt-3 flex items-baseline gap-2">
+          <h2 class="text-2xl font-bold text-slate-900" id="kpi-total-rev">\$57.635.343</h2>
+        </div>
+        <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
+          <span id="kpi-rev-sub">Equiv: u$s 38.424</span>
+          <span class="text-emerald-600 font-medium">100% Ingresos Netos</span>
+        </div>
+      </div>
+
+      <!-- KPI 2: Ocupación -->
+      <div class="bg-white rounded-xl p-5 card-shadow border border-slate-100">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Ocupación Hotel</span>
+          <span class="p-2 rounded-lg bg-blue-50 text-blue-600"><i data-lucide="bed-double" class="w-4 h-4"></i></span>
+        </div>
+        <div class="mt-3 flex items-baseline gap-2">
+          <h2 class="text-2xl font-bold text-slate-900" id="kpi-occ-physical">79,29%</h2>
+          <span class="text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-800" id="kpi-occ-net">98,23% s/Disp.</span>
+        </div>
+        <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
+          <span id="kpi-rooms-detail">111 Ocup. / 140 Físicas (27 OOO)</span>
+          <span class="text-emerald-600 font-medium" id="kpi-occ-ly">LY: 66,43%</span>
+        </div>
+      </div>
+
+      <!-- KPI 3: Tarifa Promedio & RevPAR -->
+      <div class="bg-white rounded-xl p-5 card-shadow border border-slate-100">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">ADR Puro / ARR Total</span>
+          <span class="p-2 rounded-lg bg-amber-50 text-amber-600"><i data-lucide="trending-up" class="w-4 h-4"></i></span>
+        </div>
+        <div class="mt-3 flex items-baseline gap-2">
+          <h2 class="text-2xl font-bold text-slate-900" id="kpi-adr">\$199.779</h2>
+          <span class="text-xs text-slate-500" id="kpi-arr-total">ARR c/Paq: \$225.014</span>
+        </div>
+        <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
+          <span id="kpi-revpar">RevPAR: \$196.243</span>
+          <span class="text-emerald-600 font-medium" id="kpi-adr-ly">+24,3% vs LY</span>
+        </div>
+      </div>
+
+      <!-- KPI 4: Cubiertos y A&B -->
+      <div class="bg-white rounded-xl p-5 card-shadow border border-slate-100">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total A&B (Outlets + Banq.)</span>
+          <span class="p-2 rounded-lg bg-purple-50 text-purple-600"><i data-lucide="utensils" class="w-4 h-4"></i></span>
+        </div>
+        <div class="mt-3 flex items-baseline gap-2">
+          <h2 class="text-2xl font-bold text-slate-900" id="kpi-ab-rev">\$28.933.519</h2>
+        </div>
+        <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
+          <span id="kpi-covers">501 Cubiertos (375 Out. / 126 Banq.)</span>
+          <span class="text-purple-600 font-medium" id="kpi-ab-share">50,2% del Hotel</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- BARRA DE INDICADORES OPERATIVOS DE HABITACIONES -->
+    <section class="bg-white rounded-xl p-4 card-shadow border border-slate-100">
+      <div class="flex flex-wrap items-center justify-between gap-4 text-xs sm:text-sm">
+        <div class="flex items-center gap-2 font-semibold text-slate-700">
+          <i data-lucide="activity" class="w-4 h-4 text-amber-500"></i>
+          <span> Radiografía Operativa (F138):</span>
+        </div>
+        <div class="flex flex-wrap gap-4 sm:gap-6">
+          <div><span class="text-slate-400">Transients:</span> <strong class="text-slate-800" id="stat-transients">97 hab.</strong></div>
+          <div><span class="text-slate-400">Grupos:</span> <strong class="text-slate-800" id="stat-groups">11 hab.</strong></div>
+          <div><span class="text-slate-400">Tripulación (Crews):</span> <strong class="text-slate-800" id="stat-crews">3 hab.</strong></div>
+          <div><span class="text-slate-400">Huéspedes (Personas):</span> <strong class="text-slate-800" id="stat-guests">178 pax</strong></div>
+          <div><span class="text-slate-400">Llegadas / Salidas:</span> <strong class="text-slate-800" id="stat-mov">80 In / 37 Out</strong></div>
+          <div><span class="text-slate-400">Fuera de Orden (OOO):</span> <strong class="text-rose-600" id="stat-ooo">27 hab.</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GRÁFICOS INTERACTIVOS -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Composición por Departamento -->
+      <div class="bg-white rounded-xl p-5 card-shadow border border-slate-100 lg:col-span-5 flex flex-col justify-between">
+        <div>
+          <h3 class="text-base font-bold text-slate-800">Mix de Ventas por Departamento</h3>
+          <p class="text-xs text-slate-400 mb-4">Participación porcentual sobre la facturación neta</p>
+        </div>
+        <div class="relative h-64 flex items-center justify-center">
+          <canvas id="deptChart"></canvas>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs text-slate-600" id="dept-legend"></div>
+      </div>
+
+      <!-- Desglose Outlets y Centros de Facturación -->
+      <div class="bg-white rounded-xl p-5 card-shadow border border-slate-100 lg:col-span-7">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h3 class="text-base font-bold text-slate-800">Rendimiento de Outlets A&B y Banquetes</h3>
+            <p class="text-xs text-slate-400">Comparativa de ingresos por punto de venta (Alimentos, Bebidas y Salones)</p>
+          </div>
+          <span class="text-xs font-medium px-2.5 py-1 rounded bg-slate-100 text-slate-600" id="chart-currency-badge">Valores en ARS</span>
+        </div>
+        <div class="relative h-72">
+          <canvas id="outletsChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- TABLA DETALLADA POR SECTOR Y CENTRO DE COSTO -->
+    <section class="bg-white rounded-xl card-shadow border border-slate-100 overflow-hidden">
+      <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h3 class="text-base font-bold text-slate-800">Detalle Ejecutivo de Ventas (Día vs. MTD vs. YTD)</h3>
+          <p class="text-xs text-slate-400">Incluye las aperturas de Opera PMS (incorporando La Federala y Pool Snack en acumulados)</p>
+        </div>
+        <!-- Filtro por departamento -->
+        <div class="flex items-center gap-2">
+          <select id="deptFilter" onchange="renderTable()" class="text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <option value="ALL">Todos los Departamentos</option>
+            <option value="HABITACIONES">Habitaciones (Rooms)</option>
+            <option value="OUTLETS A&B">Outlets A&B</option>
+            <option value="BANQUETES">Banquetes y Eventos</option>
+            <option value="OTROS">Health Club, Parking y Otros</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-200">
+              <th class="py-3.5 px-4 font-semibold">Departamento / Rubro</th>
+              <th class="py-3.5 px-4 font-semibold text-right">Venta Día (17/11)</th>
+              <th class="py-3.5 px-4 font-semibold text-right">Acum. Mes (MTD)</th>
+              <th class="py-3.5 px-4 font-semibold text-right">Acum. Año (YTD)</th>
+              <th class="py-3.5 px-4 font-semibold text-right">% Share (Período)</th>
+              <th class="py-3.5 px-4 font-semibold text-center">KPI Operativo</th>
+            </tr>
+          </thead>
+          <tbody id="salesTableBody" class="divide-y divide-slate-100 text-sm">
+            <!-- Filas generadas dinámicamente -->
+          </tbody>
+          <tfoot id="salesTableFoot" class="bg-slate-900 text-white font-semibold text-sm">
+            <!-- Totalizador dinámico -->
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // =========================================================================
+    // BASE DE DATOS EMBEBIDA (Extraída de REPORTE DAILY OPERA - SHERATON PILAR)
+    // Tipo de cambio implícito Opera: \$1.500 ARS = 1 USD
+    // =========================================================================
+    const EXCHANGE_RATE = 1500;
+    let currentPeriod = 'day'; // 'day' | 'mtd' | 'ytd'
+    let currentCurrency = 'ARS'; // 'ARS' | 'USD'
+
+    const hotelStats = {
+      day: {
+        totalRev: 57635342.69,
+        occPhysical: "79,29%",
+        occNet: "98,23% s/Disp.",
+        roomsDetail: "111 Ocup. / 140 Físicas (27 OOO)",
+        occLy: "LY: 66,43%",
+        adrPure: 199778.78,
+        arrTotal: 225013.86,
+        revPar: 196242.88,
+        abRev: 28933519.14,
+        covers: "501 Cubiertos (375 Out. / 126 Banq.)",
+        transients: "97 hab.",
+        groups: "11 hab.",
+        crews: "3 hab.",
+        guests: "178 pax",
+        mov: "80 In / 37 Out",
+        ooo: "27 hab."
+      },
+      mtd: {
+        totalRev: 828571916.01,
+        occPhysical: "71,82%",
+        occNet: "86,08% s/Disp.",
+        roomsDetail: "1.709 Ocup. / 2.380 Físicas (391 OOO)",
+        occLy: "LY: 73,53%",
+        adrPure: 174159.40,
+        arrTotal: 199869.03,
+        revPar: 149749.28,
+        abRev: 453240110.50,
+        covers: "375+ Cubiertos reg. en Daily",
+        transients: "942 hab.",
+        groups: "716 hab.",
+        crews: "51 hab.",
+        guests: "2.801 pax",
+        mov: "875 In / 822 Out",
+        ooo: "391 hab. mes"
+      },
+      ytd: {
+        totalRev: 11873473389.30,
+        occPhysical: "59,28%",
+        occNet: "61,15% s/Disp.",
+        roomsDetail: "26.625 Ocup. / 44.940 Físicas (1.375 OOO)",
+        occLy: "LY: 61,60%",
+        adrPure: 133996.49,
+        arrTotal: 158420.00,
+        revPar: 81845.32,
+        abRev: 6895420100.00,
+        covers: "Acumulado Anual Opera",
+        transients: "17.787 hab.",
+        groups: "8.018 hab.",
+        crews: "820 hab.",
+        guests: "46.794 pax",
+        mov: "13.681 In / 13.611 Out",
+        ooo: "1.375 hab. año"
+      }
+    };
+
+    // Detalle por línea de negocio (ARS)
+    const lineItems = [
+      // HABITACIONES
+      { dept: "HABITACIONES", name: "Alojamiento Puro (Transient + Grupos + Crew)", day: 17672753.97, mtd: 256625350.64, ytd: 3255172409.59, kpi: "111 hab. (Día) / 1.709 (Mes)" },
+      { dept: "HABITACIONES", name: "Paquetes / Otros Ingresos Habitaciones (No Show / Early-Late)", day: 7303784.54, mtd: 84950830.06, ytd: 962760220.41, kpi: "Packages & Rebates" },
+
+      // OUTLETS A&B
+      { dept: "OUTLETS A&B", name: "Las Vasijas — Alimentos", day: 10940836.36, mtd: 93829724.19, ytd: 1218893739.32, kpi: "242 cubiertos (Día)" },
+      { dept: "OUTLETS A&B", name: "Las Vasijas — Bebidas", day: 737685.94, mtd: 11798719.26, ytd: 110663574.16, kpi: "Ticket Prom: \$48.258" },
+      { dept: "OUTLETS A&B", name: "Don Giovanni — Alimentos", day: 3630165.28, mtd: 19037364.31, ytd: 237644462.13, kpi: "48 cubiertos (Día)" },
+      { dept: "OUTLETS A&B", name: "Don Giovanni — Bebidas", day: 954958.68, mtd: 4946958.65, ytd: 75742991.81, kpi: "Ticket Prom: \$95.523" },
+      { dept: "OUTLETS A&B", name: "Lobby Bar — Alimentos", day: 2158842.98, mtd: 28820561.71, ytd: 366858237.54, kpi: "69 cubiertos (Día)" },
+      { dept: "OUTLETS A&B", name: "Lobby Bar — Bebidas", day: 416694.22, mtd: 6531942.34, ytd: 92478290.96, kpi: "Ticket Prom: \$37.327" },
+      { dept: "OUTLETS A&B", name: "Room Service — Alimentos & Bebidas", day: 520057.01, mtd: 8165031.26, ytd: 113866146.97, kpi: "16 cubiertos (Día)" },
+      { dept: "OUTLETS A&B", name: "La Federala & Pool Snack (Acumulados Opera)", day: 0, mtd: 6545867.74, ytd: 95820440.15, kpi: "Activos en MTD/YTD" },
+
+      // BANQUETES
+      { dept: "BANQUETES", name: "Banquetes — Comestibles", day: 6961983.48, mtd: 151060811.34, ytd: 2639711126.92, kpi: "126 cubiertos (Día)" },
+      { dept
